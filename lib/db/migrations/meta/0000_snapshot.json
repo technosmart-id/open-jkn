@@ -1,0 +1,6572 @@
+{
+  "id": "159e023c-adc2-4460-ad0e-b26848c90ca2",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.account": {
+      "name": "account",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider_id": {
+          "name": "provider_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "access_token": {
+          "name": "access_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refresh_token": {
+          "name": "refresh_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "id_token": {
+          "name": "id_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "access_token_expires_at": {
+          "name": "access_token_expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refresh_token_expires_at": {
+          "name": "refresh_token_expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scope": {
+          "name": "scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "account_user_id_user_id_fk": {
+          "name": "account_user_id_user_id_fk",
+          "tableFrom": "account",
+          "tableTo": "user",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.session": {
+      "name": "session",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_agent": {
+          "name": "user_agent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "session_user_id_user_id_fk": {
+          "name": "session_user_id_user_id_fk",
+          "tableFrom": "session",
+          "tableTo": "user",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "session_token_unique": {
+          "name": "session_token_unique",
+          "nullsNotDistinct": false,
+          "columns": ["token"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user": {
+      "name": "user",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email_verified": {
+          "name": "email_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "username": {
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "display_username": {
+          "name": "display_username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "user_email_unique": {
+          "name": "user_email_unique",
+          "nullsNotDistinct": false,
+          "columns": ["email"]
+        },
+        "user_username_unique": {
+          "name": "user_username_unique",
+          "nullsNotDistinct": false,
+          "columns": ["username"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.verification": {
+      "name": "verification",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "identifier": {
+          "name": "identifier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.notification": {
+      "name": "notification",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'info'"
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "link": {
+          "name": "link",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "read": {
+          "name": "read",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "notification_user_id_user_id_fk": {
+          "name": "notification_user_id_user_id_fk",
+          "tableFrom": "notification",
+          "tableTo": "user",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.bank_persepsi": {
+      "name": "bank_persepsi",
+      "schema": "",
+      "columns": {
+        "kd_kanwil": {
+          "name": "kd_kanwil",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kppbb": {
+          "name": "kd_kppbb",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_bank_tunggal": {
+          "name": "kd_bank_tunggal",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_bank_persepsi": {
+          "name": "kd_bank_persepsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nm_bank_persepsi": {
+          "name": "nm_bank_persepsi",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "al_bank_persepsi": {
+          "name": "al_bank_persepsi",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_rek_bank_persepsi": {
+          "name": "no_rek_bank_persepsi",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "bank_persepsi_kd_kanwil_kd_kppbb_kd_bank_tunggal_kd_bank_persepsi_pk": {
+          "name": "bank_persepsi_kd_kanwil_kd_kppbb_kd_bank_tunggal_kd_bank_persepsi_pk",
+          "columns": [
+            "kd_kanwil",
+            "kd_kppbb",
+            "kd_bank_tunggal",
+            "kd_bank_persepsi"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.bank_tunggal": {
+      "name": "bank_tunggal",
+      "schema": "",
+      "columns": {
+        "kd_kanwil": {
+          "name": "kd_kanwil",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kppbb": {
+          "name": "kd_kppbb",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_bank_tunggal": {
+          "name": "kd_bank_tunggal",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nm_bank_tunggal": {
+          "name": "nm_bank_tunggal",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "al_bank_tunggal": {
+          "name": "al_bank_tunggal",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_rek_bank_tunggal": {
+          "name": "no_rek_bank_tunggal",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "bank_tunggal_kd_kanwil_kd_kppbb_kd_bank_tunggal_pk": {
+          "name": "bank_tunggal_kd_kanwil_kd_kppbb_kd_bank_tunggal_pk",
+          "columns": ["kd_kanwil", "kd_kppbb", "kd_bank_tunggal"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_fasilitas_bangunan": {
+      "name": "dat_fasilitas_bangunan",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_fasilitas": {
+          "name": "kd_fasilitas",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jml_satuan": {
+          "name": "jml_satuan",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_fasilitas_bangunan_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_kd_fasilitas_pk": {
+          "name": "dat_fasilitas_bangunan_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_kd_fasilitas_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng",
+            "kd_fasilitas"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_jpb12": {
+      "name": "dat_jpb12",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type_jpb12": {
+          "name": "type_jpb12",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_jpb12_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk": {
+          "name": "dat_jpb12_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_jpb13": {
+      "name": "dat_jpb13",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_jpb13": {
+          "name": "kls_jpb13",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jml_jpb13": {
+          "name": "jml_jpb13",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "luas_jpb13_dgn_ac_sent": {
+          "name": "luas_jpb13_dgn_ac_sent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "luas_jpb13_lain_dgn_ac_sent": {
+          "name": "luas_jpb13_lain_dgn_ac_sent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_jpb13_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk": {
+          "name": "dat_jpb13_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_jpb14": {
+      "name": "dat_jpb14",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "luas_kanopi_jpb14": {
+          "name": "luas_kanopi_jpb14",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_jpb14_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk": {
+          "name": "dat_jpb14_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_jpb15": {
+      "name": "dat_jpb15",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "letak_tangki_jpb15": {
+          "name": "letak_tangki_jpb15",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kapasitas_tangki_jpb15": {
+          "name": "kapasitas_tangki_jpb15",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_jpb15_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk": {
+          "name": "dat_jpb15_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_jpb16": {
+      "name": "dat_jpb16",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_jpb16": {
+          "name": "kls_jpb16",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_jpb16_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk": {
+          "name": "dat_jpb16_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_jpb2": {
+      "name": "dat_jpb2",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_jpb2": {
+          "name": "kls_jpb2",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_jpb2_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk": {
+          "name": "dat_jpb2_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_jpb3": {
+      "name": "dat_jpb3",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type_konstruksi": {
+          "name": "type_konstruksi",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ting_kolom_jpb3": {
+          "name": "ting_kolom_jpb3",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lbr_bent_jpb3": {
+          "name": "lbr_bent_jpb3",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "luas_mezzanine_jpb3": {
+          "name": "luas_mezzanine_jpb3",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "keliling_dinding_jpb3": {
+          "name": "keliling_dinding_jpb3",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "daya_dukung_lantai_jpb3": {
+          "name": "daya_dukung_lantai_jpb3",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_jpb3_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk": {
+          "name": "dat_jpb3_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_jpb4": {
+      "name": "dat_jpb4",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_jpb4": {
+          "name": "kls_jpb4",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_jpb4_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk": {
+          "name": "dat_jpb4_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_jpb5": {
+      "name": "dat_jpb5",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_jpb5": {
+          "name": "kls_jpb5",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "luas_kmr_jpb5_dgn_ac_sent": {
+          "name": "luas_kmr_jpb5_dgn_ac_sent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "luas_rng_lain_jpb5_dgn_ac_sent": {
+          "name": "luas_rng_lain_jpb5_dgn_ac_sent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_jpb5_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk": {
+          "name": "dat_jpb5_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_jpb6": {
+      "name": "dat_jpb6",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_jpb6": {
+          "name": "kls_jpb6",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_jpb6_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk": {
+          "name": "dat_jpb6_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_jpb7": {
+      "name": "dat_jpb7",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jns_jpb7": {
+          "name": "jns_jpb7",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bintang_jpb7": {
+          "name": "bintang_jpb7",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jml_kmr_jpb7": {
+          "name": "jml_kmr_jpb7",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "luas_kmr_jpb7_dgn_ac_sent": {
+          "name": "luas_kmr_jpb7_dgn_ac_sent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "luas_kmr_lain_jpb7_dgn_ac_sent": {
+          "name": "luas_kmr_lain_jpb7_dgn_ac_sent",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_jpb7_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk": {
+          "name": "dat_jpb7_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_jpb8": {
+      "name": "dat_jpb8",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type_konstruksi": {
+          "name": "type_konstruksi",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ting_kolom_jpb8": {
+          "name": "ting_kolom_jpb8",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lbr_bent_jpb8": {
+          "name": "lbr_bent_jpb8",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "luas_mezzanine_jpb8": {
+          "name": "luas_mezzanine_jpb8",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "keliling_dinding_jpb8": {
+          "name": "keliling_dinding_jpb8",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "daya_dukung_lantai_jpb8": {
+          "name": "daya_dukung_lantai_jpb8",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_jpb8_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk": {
+          "name": "dat_jpb8_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_jpb9": {
+      "name": "dat_jpb9",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_jpb9": {
+          "name": "kls_jpb9",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_jpb9_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk": {
+          "name": "dat_jpb9_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_nilai_individu": {
+      "name": "dat_nilai_individu",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_formulir_individu": {
+          "name": "no_formulir_individu",
+          "type": "char(11)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_individu": {
+          "name": "nilai_individu",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tgl_penilaian_individu": {
+          "name": "tgl_penilaian_individu",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nip_penilai_individu": {
+          "name": "nip_penilai_individu",
+          "type": "char(18)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tgl_pemeriksaan_individu": {
+          "name": "tgl_pemeriksaan_individu",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nip_pemeriksa_individu": {
+          "name": "nip_pemeriksa_individu",
+          "type": "char(18)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tgl_rekam_nilai_individu": {
+          "name": "tgl_rekam_nilai_individu",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "nip_perekam_individu": {
+          "name": "nip_perekam_individu",
+          "type": "char(18)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "dat_nilai_individu_formulir_idx": {
+          "name": "dat_nilai_individu_formulir_idx",
+          "columns": [
+            {
+              "expression": "no_formulir_individu",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "kd_propinsi",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "kd_dati2",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "kd_kecamatan",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "kd_kelurahan",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "kd_blok",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "no_urut",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "kd_jns_op",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "no_bng",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_nilai_individu_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk": {
+          "name": "dat_nilai_individu_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_nir": {
+      "name": "dat_nir",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_znt": {
+          "name": "kd_znt",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_nir_znt": {
+          "name": "thn_nir_znt",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kanwil": {
+          "name": "kd_kanwil",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kppbb": {
+          "name": "kd_kppbb",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jns_dokumen": {
+          "name": "jns_dokumen",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_dokumen": {
+          "name": "no_dokumen",
+          "type": "char(11)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nir": {
+          "name": "nir",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_nir_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_znt_thn_nir_znt_pk": {
+          "name": "dat_nir_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_znt_thn_nir_znt_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_znt",
+            "thn_nir_znt"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_objek_pajak": {
+      "name": "dat_objek_pajak",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subjek_pajak_id": {
+          "name": "subjek_pajak_id",
+          "type": "char(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_formulir_spop": {
+          "name": "no_formulir_spop",
+          "type": "char(11)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_persil": {
+          "name": "no_persil",
+          "type": "varchar(5)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "jalan_op": {
+          "name": "jalan_op",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "blok_kav_no_op": {
+          "name": "blok_kav_no_op",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rw_op": {
+          "name": "rw_op",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rt_op": {
+          "name": "rt_op",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kd_status_cabang": {
+          "name": "kd_status_cabang",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "kd_status_wp": {
+          "name": "kd_status_wp",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'1'"
+        },
+        "total_luas_bumi": {
+          "name": "total_luas_bumi",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "total_luas_bng": {
+          "name": "total_luas_bng",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "njop_bumi": {
+          "name": "njop_bumi",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "njop_bng": {
+          "name": "njop_bng",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "status_peta_op": {
+          "name": "status_peta_op",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "jns_transaksi_op": {
+          "name": "jns_transaksi_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'1'"
+        },
+        "tgl_pendataan_op": {
+          "name": "tgl_pendataan_op",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nip_pendata": {
+          "name": "nip_pendata",
+          "type": "char(18)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tgl_pemeriksaan_op": {
+          "name": "tgl_pemeriksaan_op",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nip_pemeriksa_op": {
+          "name": "nip_pemeriksa_op",
+          "type": "char(18)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tgl_perekaman_op": {
+          "name": "tgl_perekaman_op",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "nip_perekam_op": {
+          "name": "nip_perekam_op",
+          "type": "char(18)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "dat_objek_pajak_subjek_pajak_id_dat_subjek_pajak_subjek_pajak_id_fk": {
+          "name": "dat_objek_pajak_subjek_pajak_id_dat_subjek_pajak_subjek_pajak_id_fk",
+          "tableFrom": "dat_objek_pajak",
+          "tableTo": "dat_subjek_pajak",
+          "columnsFrom": ["subjek_pajak_id"],
+          "columnsTo": ["subjek_pajak_id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "dat_objek_pajak_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_pk": {
+          "name": "dat_objek_pajak_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_op_anggota": {
+      "name": "dat_op_anggota",
+      "schema": "",
+      "columns": {
+        "kd_propinsi_induk": {
+          "name": "kd_propinsi_induk",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2_induk": {
+          "name": "kd_dati2_induk",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan_induk": {
+          "name": "kd_kecamatan_induk",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan_induk": {
+          "name": "kd_kelurahan_induk",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok_induk": {
+          "name": "kd_blok_induk",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut_induk": {
+          "name": "no_urut_induk",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op_induk": {
+          "name": "kd_jns_op_induk",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "luas_bumi_beban": {
+          "name": "luas_bumi_beban",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "luas_bng_beban": {
+          "name": "luas_bng_beban",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nilai_sistem_bumi_beban": {
+          "name": "nilai_sistem_bumi_beban",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nilai_sistem_bng_beban": {
+          "name": "nilai_sistem_bng_beban",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "njop_bumi_beban": {
+          "name": "njop_bumi_beban",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "njop_bng_beban": {
+          "name": "njop_bng_beban",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_op_anggota_kd_propinsi_induk_kd_dati2_induk_kd_kecamatan_induk_kd_kelurahan_induk_kd_blok_induk_no_urut_induk_kd_jns_op_induk_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_pk": {
+          "name": "dat_op_anggota_kd_propinsi_induk_kd_dati2_induk_kd_kecamatan_induk_kd_kelurahan_induk_kd_blok_induk_no_urut_induk_kd_jns_op_induk_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_pk",
+          "columns": [
+            "kd_propinsi_induk",
+            "kd_dati2_induk",
+            "kd_kecamatan_induk",
+            "kd_kelurahan_induk",
+            "kd_blok_induk",
+            "no_urut_induk",
+            "kd_jns_op_induk",
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_op_bangunan": {
+      "name": "dat_op_bangunan",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bng": {
+          "name": "no_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jpb": {
+          "name": "kd_jpb",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_formulir_lspop": {
+          "name": "no_formulir_lspop",
+          "type": "char(11)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dibangun_bng": {
+          "name": "thn_dibangun_bng",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_renovasi_bng": {
+          "name": "thn_renovasi_bng",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "luas_bng": {
+          "name": "luas_bng",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "jml_lantai_bng": {
+          "name": "jml_lantai_bng",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "kondisi_bng": {
+          "name": "kondisi_bng",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jns_konstruksi_bng": {
+          "name": "jns_konstruksi_bng",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "jns_atap_bng": {
+          "name": "jns_atap_bng",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kd_dinding": {
+          "name": "kd_dinding",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kd_lantai": {
+          "name": "kd_lantai",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kd_langit_langit": {
+          "name": "kd_langit_langit",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nilai_sistem_bng": {
+          "name": "nilai_sistem_bng",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jns_transaksi_bng": {
+          "name": "jns_transaksi_bng",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'1'"
+        },
+        "tgl_pendataan_bng": {
+          "name": "tgl_pendataan_bng",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nip_pendata_bng": {
+          "name": "nip_pendata_bng",
+          "type": "char(18)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tgl_pemeriksaan_bng": {
+          "name": "tgl_pemeriksaan_bng",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nip_pemeriksa_bng": {
+          "name": "nip_pemeriksa_bng",
+          "type": "char(18)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tgl_perekaman_bng": {
+          "name": "tgl_perekaman_bng",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "nip_perekam_bng": {
+          "name": "nip_perekam_bng",
+          "type": "char(18)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_op_bangunan_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk": {
+          "name": "dat_op_bangunan_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bng_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bng"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_op_bumi": {
+      "name": "dat_op_bumi",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_bumi": {
+          "name": "no_bumi",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "kd_znt": {
+          "name": "kd_znt",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "luas_bumi": {
+          "name": "luas_bumi",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "jns_bumi": {
+          "name": "jns_bumi",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'1'"
+        },
+        "nilai_sistem_bumi": {
+          "name": "nilai_sistem_bumi",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_op_bumi_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bumi_pk": {
+          "name": "dat_op_bumi_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_no_bumi_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "no_bumi"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_op_induk": {
+      "name": "dat_op_induk",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_op_induk_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_pk": {
+          "name": "dat_op_induk_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_subjek_pajak": {
+      "name": "dat_subjek_pajak",
+      "schema": "",
+      "columns": {
+        "subjek_pajak_id": {
+          "name": "subjek_pajak_id",
+          "type": "char(30)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nm_wp": {
+          "name": "nm_wp",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PEMILIK'"
+        },
+        "jalan_wp": {
+          "name": "jalan_wp",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "blok_kav_no_wp": {
+          "name": "blok_kav_no_wp",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rw_wp": {
+          "name": "rw_wp",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rt_wp": {
+          "name": "rt_wp",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kelurahan_wp": {
+          "name": "kelurahan_wp",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kota_wp": {
+          "name": "kota_wp",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kd_pos_wp": {
+          "name": "kd_pos_wp",
+          "type": "varchar(5)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telp_wp": {
+          "name": "telp_wp",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "npwp": {
+          "name": "npwp",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status_pekerjaan_wp": {
+          "name": "status_pekerjaan_wp",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_subjek_pajak_njoptkp": {
+      "name": "dat_subjek_pajak_njoptkp",
+      "schema": "",
+      "columns": {
+        "subjek_pajak_id": {
+          "name": "subjek_pajak_id",
+          "type": "char(30)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_njoptkp": {
+          "name": "thn_njoptkp",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "dat_subjek_pajak_njoptkp_nop_idx": {
+          "name": "dat_subjek_pajak_njoptkp_nop_idx",
+          "columns": [
+            {
+              "expression": "kd_propinsi",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "kd_dati2",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "kd_kecamatan",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "kd_kelurahan",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "kd_blok",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "no_urut",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "kd_jns_op",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dat_znt": {
+      "name": "dat_znt",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_znt": {
+          "name": "kd_znt",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dat_znt_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_znt_pk": {
+          "name": "dat_znt_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_znt_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_znt"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_daya_dukung": {
+      "name": "dbkb_daya_dukung",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_daya_dukung": {
+          "name": "thn_dbkb_daya_dukung",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type_konstruksi": {
+          "name": "type_konstruksi",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_daya_dukung": {
+          "name": "nilai_dbkb_daya_dukung",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_daya_dukung_kd_propinsi_kd_dati2_thn_dbkb_daya_dukung_type_konstruksi_pk": {
+          "name": "dbkb_daya_dukung_kd_propinsi_kd_dati2_thn_dbkb_daya_dukung_type_konstruksi_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_daya_dukung",
+            "type_konstruksi"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_jpb12": {
+      "name": "dbkb_jpb12",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_jpb12": {
+          "name": "thn_dbkb_jpb12",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_dbkb_jpb12": {
+          "name": "kls_dbkb_jpb12",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_min_jpb12": {
+          "name": "lantai_min_jpb12",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_max_jpb12": {
+          "name": "lantai_max_jpb12",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_jpb12": {
+          "name": "nilai_dbkb_jpb12",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_jpb12_kd_propinsi_kd_dati2_thn_dbkb_jpb12_kls_dbkb_jpb12_lantai_min_jpb12_lantai_max_jpb12_pk": {
+          "name": "dbkb_jpb12_kd_propinsi_kd_dati2_thn_dbkb_jpb12_kls_dbkb_jpb12_lantai_min_jpb12_lantai_max_jpb12_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_jpb12",
+            "kls_dbkb_jpb12",
+            "lantai_min_jpb12",
+            "lantai_max_jpb12"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_jpb13": {
+      "name": "dbkb_jpb13",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_jpb13": {
+          "name": "thn_dbkb_jpb13",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_dbkb_jpb13": {
+          "name": "kls_dbkb_jpb13",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_min_jpb13": {
+          "name": "lantai_min_jpb13",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_max_jpb13": {
+          "name": "lantai_max_jpb13",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_jpb13": {
+          "name": "nilai_dbkb_jpb13",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_jpb13_kd_propinsi_kd_dati2_thn_dbkb_jpb13_kls_dbkb_jpb13_lantai_min_jpb13_lantai_max_jpb13_pk": {
+          "name": "dbkb_jpb13_kd_propinsi_kd_dati2_thn_dbkb_jpb13_kls_dbkb_jpb13_lantai_min_jpb13_lantai_max_jpb13_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_jpb13",
+            "kls_dbkb_jpb13",
+            "lantai_min_jpb13",
+            "lantai_max_jpb13"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_jpb14": {
+      "name": "dbkb_jpb14",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_jpb14": {
+          "name": "thn_dbkb_jpb14",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_dbkb_jpb14": {
+          "name": "kls_dbkb_jpb14",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_min_jpb14": {
+          "name": "lantai_min_jpb14",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_max_jpb14": {
+          "name": "lantai_max_jpb14",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_jpb14": {
+          "name": "nilai_dbkb_jpb14",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_jpb14_kd_propinsi_kd_dati2_thn_dbkb_jpb14_kls_dbkb_jpb14_lantai_min_jpb14_lantai_max_jpb14_pk": {
+          "name": "dbkb_jpb14_kd_propinsi_kd_dati2_thn_dbkb_jpb14_kls_dbkb_jpb14_lantai_min_jpb14_lantai_max_jpb14_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_jpb14",
+            "kls_dbkb_jpb14",
+            "lantai_min_jpb14",
+            "lantai_max_jpb14"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_jpb15": {
+      "name": "dbkb_jpb15",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_jpb15": {
+          "name": "thn_dbkb_jpb15",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_dbkb_jpb15": {
+          "name": "kls_dbkb_jpb15",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_min_jpb15": {
+          "name": "lantai_min_jpb15",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_max_jpb15": {
+          "name": "lantai_max_jpb15",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_jpb15": {
+          "name": "nilai_dbkb_jpb15",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_jpb15_kd_propinsi_kd_dati2_thn_dbkb_jpb15_kls_dbkb_jpb15_lantai_min_jpb15_lantai_max_jpb15_pk": {
+          "name": "dbkb_jpb15_kd_propinsi_kd_dati2_thn_dbkb_jpb15_kls_dbkb_jpb15_lantai_min_jpb15_lantai_max_jpb15_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_jpb15",
+            "kls_dbkb_jpb15",
+            "lantai_min_jpb15",
+            "lantai_max_jpb15"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_jpb16": {
+      "name": "dbkb_jpb16",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_jpb16": {
+          "name": "thn_dbkb_jpb16",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_dbkb_jpb16": {
+          "name": "kls_dbkb_jpb16",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_min_jpb16": {
+          "name": "lantai_min_jpb16",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_max_jpb16": {
+          "name": "lantai_max_jpb16",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_jpb16": {
+          "name": "nilai_dbkb_jpb16",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_jpb16_kd_propinsi_kd_dati2_thn_dbkb_jpb16_kls_dbkb_jpb16_lantai_min_jpb16_lantai_max_jpb16_pk": {
+          "name": "dbkb_jpb16_kd_propinsi_kd_dati2_thn_dbkb_jpb16_kls_dbkb_jpb16_lantai_min_jpb16_lantai_max_jpb16_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_jpb16",
+            "kls_dbkb_jpb16",
+            "lantai_min_jpb16",
+            "lantai_max_jpb16"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_jpb2": {
+      "name": "dbkb_jpb2",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_jpb2": {
+          "name": "thn_dbkb_jpb2",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_dbkb_jpb2": {
+          "name": "kls_dbkb_jpb2",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_min_jpb2": {
+          "name": "lantai_min_jpb2",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_max_jpb2": {
+          "name": "lantai_max_jpb2",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_jpb2": {
+          "name": "nilai_dbkb_jpb2",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_jpb2_kd_propinsi_kd_dati2_thn_dbkb_jpb2_kls_dbkb_jpb2_lantai_min_jpb2_lantai_max_jpb2_pk": {
+          "name": "dbkb_jpb2_kd_propinsi_kd_dati2_thn_dbkb_jpb2_kls_dbkb_jpb2_lantai_min_jpb2_lantai_max_jpb2_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_jpb2",
+            "kls_dbkb_jpb2",
+            "lantai_min_jpb2",
+            "lantai_max_jpb2"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_jpb3": {
+      "name": "dbkb_jpb3",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_jpb3": {
+          "name": "thn_dbkb_jpb3",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_dbkb_jpb3": {
+          "name": "kls_dbkb_jpb3",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_min_jpb3": {
+          "name": "lantai_min_jpb3",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_max_jpb3": {
+          "name": "lantai_max_jpb3",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_jpb3": {
+          "name": "nilai_dbkb_jpb3",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_jpb3_kd_propinsi_kd_dati2_thn_dbkb_jpb3_kls_dbkb_jpb3_lantai_min_jpb3_lantai_max_jpb3_pk": {
+          "name": "dbkb_jpb3_kd_propinsi_kd_dati2_thn_dbkb_jpb3_kls_dbkb_jpb3_lantai_min_jpb3_lantai_max_jpb3_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_jpb3",
+            "kls_dbkb_jpb3",
+            "lantai_min_jpb3",
+            "lantai_max_jpb3"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_jpb4": {
+      "name": "dbkb_jpb4",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_jpb4": {
+          "name": "thn_dbkb_jpb4",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_dbkb_jpb4": {
+          "name": "kls_dbkb_jpb4",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_min_jpb4": {
+          "name": "lantai_min_jpb4",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_max_jpb4": {
+          "name": "lantai_max_jpb4",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_jpb4": {
+          "name": "nilai_dbkb_jpb4",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_jpb4_kd_propinsi_kd_dati2_thn_dbkb_jpb4_kls_dbkb_jpb4_lantai_min_jpb4_lantai_max_jpb4_pk": {
+          "name": "dbkb_jpb4_kd_propinsi_kd_dati2_thn_dbkb_jpb4_kls_dbkb_jpb4_lantai_min_jpb4_lantai_max_jpb4_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_jpb4",
+            "kls_dbkb_jpb4",
+            "lantai_min_jpb4",
+            "lantai_max_jpb4"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_jpb5": {
+      "name": "dbkb_jpb5",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_jpb5": {
+          "name": "thn_dbkb_jpb5",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_dbkb_jpb5": {
+          "name": "kls_dbkb_jpb5",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_min_jpb5": {
+          "name": "lantai_min_jpb5",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_max_jpb5": {
+          "name": "lantai_max_jpb5",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_jpb5": {
+          "name": "nilai_dbkb_jpb5",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_jpb5_kd_propinsi_kd_dati2_thn_dbkb_jpb5_kls_dbkb_jpb5_lantai_min_jpb5_lantai_max_jpb5_pk": {
+          "name": "dbkb_jpb5_kd_propinsi_kd_dati2_thn_dbkb_jpb5_kls_dbkb_jpb5_lantai_min_jpb5_lantai_max_jpb5_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_jpb5",
+            "kls_dbkb_jpb5",
+            "lantai_min_jpb5",
+            "lantai_max_jpb5"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_jpb6": {
+      "name": "dbkb_jpb6",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_jpb6": {
+          "name": "thn_dbkb_jpb6",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_dbkb_jpb6": {
+          "name": "kls_dbkb_jpb6",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_min_jpb6": {
+          "name": "lantai_min_jpb6",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_max_jpb6": {
+          "name": "lantai_max_jpb6",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_jpb6": {
+          "name": "nilai_dbkb_jpb6",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_jpb6_kd_propinsi_kd_dati2_thn_dbkb_jpb6_kls_dbkb_jpb6_lantai_min_jpb6_lantai_max_jpb6_pk": {
+          "name": "dbkb_jpb6_kd_propinsi_kd_dati2_thn_dbkb_jpb6_kls_dbkb_jpb6_lantai_min_jpb6_lantai_max_jpb6_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_jpb6",
+            "kls_dbkb_jpb6",
+            "lantai_min_jpb6",
+            "lantai_max_jpb6"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_jpb7": {
+      "name": "dbkb_jpb7",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_jpb7": {
+          "name": "thn_dbkb_jpb7",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_dbkb_jpb7": {
+          "name": "kls_dbkb_jpb7",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_min_jpb7": {
+          "name": "lantai_min_jpb7",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_max_jpb7": {
+          "name": "lantai_max_jpb7",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_jpb7": {
+          "name": "nilai_dbkb_jpb7",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_jpb7_kd_propinsi_kd_dati2_thn_dbkb_jpb7_kls_dbkb_jpb7_lantai_min_jpb7_lantai_max_jpb7_pk": {
+          "name": "dbkb_jpb7_kd_propinsi_kd_dati2_thn_dbkb_jpb7_kls_dbkb_jpb7_lantai_min_jpb7_lantai_max_jpb7_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_jpb7",
+            "kls_dbkb_jpb7",
+            "lantai_min_jpb7",
+            "lantai_max_jpb7"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_jpb8": {
+      "name": "dbkb_jpb8",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_jpb8": {
+          "name": "thn_dbkb_jpb8",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_dbkb_jpb8": {
+          "name": "kls_dbkb_jpb8",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_min_jpb8": {
+          "name": "lantai_min_jpb8",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_max_jpb8": {
+          "name": "lantai_max_jpb8",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_jpb8": {
+          "name": "nilai_dbkb_jpb8",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_jpb8_kd_propinsi_kd_dati2_thn_dbkb_jpb8_kls_dbkb_jpb8_lantai_min_jpb8_lantai_max_jpb8_pk": {
+          "name": "dbkb_jpb8_kd_propinsi_kd_dati2_thn_dbkb_jpb8_kls_dbkb_jpb8_lantai_min_jpb8_lantai_max_jpb8_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_jpb8",
+            "kls_dbkb_jpb8",
+            "lantai_min_jpb8",
+            "lantai_max_jpb8"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_jpb9": {
+      "name": "dbkb_jpb9",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_jpb9": {
+          "name": "thn_dbkb_jpb9",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kls_dbkb_jpb9": {
+          "name": "kls_dbkb_jpb9",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_min_jpb9": {
+          "name": "lantai_min_jpb9",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lantai_max_jpb9": {
+          "name": "lantai_max_jpb9",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_jpb9": {
+          "name": "nilai_dbkb_jpb9",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_jpb9_kd_propinsi_kd_dati2_thn_dbkb_jpb9_kls_dbkb_jpb9_lantai_min_jpb9_lantai_max_jpb9_pk": {
+          "name": "dbkb_jpb9_kd_propinsi_kd_dati2_thn_dbkb_jpb9_kls_dbkb_jpb9_lantai_min_jpb9_lantai_max_jpb9_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_jpb9",
+            "kls_dbkb_jpb9",
+            "lantai_min_jpb9",
+            "lantai_max_jpb9"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_material": {
+      "name": "dbkb_material",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_material": {
+          "name": "thn_dbkb_material",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_pekerjaan": {
+          "name": "kd_pekerjaan",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kegiatan": {
+          "name": "kd_kegiatan",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_material": {
+          "name": "nilai_dbkb_material",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_material_kd_propinsi_kd_dati2_thn_dbkb_material_kd_pekerjaan_kd_kegiatan_pk": {
+          "name": "dbkb_material_kd_propinsi_kd_dati2_thn_dbkb_material_kd_pekerjaan_kd_kegiatan_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_material",
+            "kd_pekerjaan",
+            "kd_kegiatan"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_mezanin": {
+      "name": "dbkb_mezanin",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_mezanin": {
+          "name": "thn_dbkb_mezanin",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_mezanin": {
+          "name": "nilai_dbkb_mezanin",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_mezanin_kd_propinsi_kd_dati2_thn_dbkb_mezanin_pk": {
+          "name": "dbkb_mezanin_kd_propinsi_kd_dati2_thn_dbkb_mezanin_pk",
+          "columns": ["kd_propinsi", "kd_dati2", "thn_dbkb_mezanin"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dbkb_standard": {
+      "name": "dbkb_standard",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_dbkb_standard": {
+          "name": "thn_dbkb_standard",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jpb": {
+          "name": "kd_jpb",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tipe_bng": {
+          "name": "tipe_bng",
+          "type": "char(5)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_bng_lantai": {
+          "name": "kd_bng_lantai",
+          "type": "char(8)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_dbkb_standard": {
+          "name": "nilai_dbkb_standard",
+          "type": "numeric(11, 4)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "dbkb_standard_kd_propinsi_kd_dati2_thn_dbkb_standard_kd_jpb_tipe_bng_kd_bng_lantai_pk": {
+          "name": "dbkb_standard_kd_propinsi_kd_dati2_thn_dbkb_standard_kd_jpb_tipe_bng_kd_bng_lantai_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "thn_dbkb_standard",
+            "kd_jpb",
+            "tipe_bng",
+            "kd_bng_lantai"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.fas_non_dep": {
+      "name": "fas_non_dep",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_non_dep": {
+          "name": "thn_non_dep",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_fasilitas": {
+          "name": "kd_fasilitas",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_non_dep": {
+          "name": "nilai_non_dep",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "fas_non_dep_kd_propinsi_kd_dati2_thn_non_dep_kd_fasilitas_pk": {
+          "name": "fas_non_dep_kd_propinsi_kd_dati2_thn_non_dep_kd_fasilitas_pk",
+          "columns": ["kd_propinsi", "kd_dati2", "thn_non_dep", "kd_fasilitas"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.fasilitas": {
+      "name": "fasilitas",
+      "schema": "",
+      "columns": {
+        "kd_fasilitas": {
+          "name": "kd_fasilitas",
+          "type": "char(2)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nm_fasilitas": {
+          "name": "nm_fasilitas",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "satuan_fasilitas": {
+          "name": "satuan_fasilitas",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status_fasilitas": {
+          "name": "status_fasilitas",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ketergantungan": {
+          "name": "ketergantungan",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.kelas_bangunan": {
+      "name": "kelas_bangunan",
+      "schema": "",
+      "columns": {
+        "kd_kls_bng": {
+          "name": "kd_kls_bng",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_awal_kls_bng": {
+          "name": "thn_awal_kls_bng",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_akhir_kls_bng": {
+          "name": "thn_akhir_kls_bng",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_min_bng": {
+          "name": "nilai_min_bng",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_max_bng": {
+          "name": "nilai_max_bng",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_per_m2_bng": {
+          "name": "nilai_per_m2_bng",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "kelas_bangunan_kd_kls_bng_thn_awal_kls_bng_pk": {
+          "name": "kelas_bangunan_kd_kls_bng_thn_awal_kls_bng_pk",
+          "columns": ["kd_kls_bng", "thn_awal_kls_bng"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.kelas_tanah": {
+      "name": "kelas_tanah",
+      "schema": "",
+      "columns": {
+        "kd_kls_tanah": {
+          "name": "kd_kls_tanah",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_awal_kls_tanah": {
+          "name": "thn_awal_kls_tanah",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_akhir_kls_tanah": {
+          "name": "thn_akhir_kls_tanah",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_min_tanah": {
+          "name": "nilai_min_tanah",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_max_tanah": {
+          "name": "nilai_max_tanah",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nilai_per_m2_tanah": {
+          "name": "nilai_per_m2_tanah",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "kelas_tanah_kd_kls_tanah_thn_awal_kls_tanah_pk": {
+          "name": "kelas_tanah_kd_kls_tanah_thn_awal_kls_tanah_pk",
+          "columns": ["kd_kls_tanah", "thn_awal_kls_tanah"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pembayaran_sppt": {
+      "name": "pembayaran_sppt",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_pajak_sppt": {
+          "name": "thn_pajak_sppt",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pembayaran_sppt_ke": {
+          "name": "pembayaran_sppt_ke",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kanwil_bank": {
+          "name": "kd_kanwil_bank",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kppbb_bank": {
+          "name": "kd_kppbb_bank",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_bank_tunggal": {
+          "name": "kd_bank_tunggal",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_bank_persepsi": {
+          "name": "kd_bank_persepsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_tp": {
+          "name": "kd_tp",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "denda_sppt": {
+          "name": "denda_sppt",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "jml_sppt_yg_dibayar": {
+          "name": "jml_sppt_yg_dibayar",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tgl_pembayaran_sppt": {
+          "name": "tgl_pembayaran_sppt",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tgl_rekam_byr_sppt": {
+          "name": "tgl_rekam_byr_sppt",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "nip_rekam_byr_sppt": {
+          "name": "nip_rekam_byr_sppt",
+          "type": "char(18)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pembayaran_sppt_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_thn_pajak_sppt_pembayaran_sppt_ke_kd_kanwil_bank_kd_kppbb_bank_kd_bank_tunggal_kd_bank_persepsi_kd_tp_pk": {
+          "name": "pembayaran_sppt_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_thn_pajak_sppt_pembayaran_sppt_ke_kd_kanwil_bank_kd_kppbb_bank_kd_bank_tunggal_kd_bank_persepsi_kd_tp_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "thn_pajak_sppt",
+            "pembayaran_sppt_ke",
+            "kd_kanwil_bank",
+            "kd_kppbb_bank",
+            "kd_bank_tunggal",
+            "kd_bank_persepsi",
+            "kd_tp"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pengurangan_pengenaan_jpb": {
+      "name": "pengurangan_pengenaan_jpb",
+      "schema": "",
+      "columns": {
+        "kd_kanwil": {
+          "name": "kd_kanwil",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kppbb": {
+          "name": "kd_kppbb",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_pelayanan": {
+          "name": "thn_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bundel_pelayanan": {
+          "name": "bundel_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut_pelayanan": {
+          "name": "no_urut_pelayanan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_propinsi_pemohon": {
+          "name": "kd_propinsi_pemohon",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2_pemohon": {
+          "name": "kd_dati2_pemohon",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan_pemohon": {
+          "name": "kd_kecamatan_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan_pemohon": {
+          "name": "kd_kelurahan_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok_pemohon": {
+          "name": "kd_blok_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut_pemohon": {
+          "name": "no_urut_pemohon",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op_pemohon": {
+          "name": "kd_jns_op_pemohon",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_pengenaan_jpb": {
+          "name": "thn_pengenaan_jpb",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jns_sk": {
+          "name": "jns_sk",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_sk": {
+          "name": "no_sk",
+          "type": "char(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pct_pengurangan_jpb": {
+          "name": "pct_pengurangan_jpb",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pengurangan_pengenaan_jpb_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk": {
+          "name": "pengurangan_pengenaan_jpb_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk",
+          "columns": [
+            "kd_kanwil",
+            "kd_kppbb",
+            "thn_pelayanan",
+            "bundel_pelayanan",
+            "no_urut_pelayanan",
+            "kd_propinsi_pemohon",
+            "kd_dati2_pemohon",
+            "kd_kecamatan_pemohon",
+            "kd_kelurahan_pemohon",
+            "kd_blok_pemohon",
+            "no_urut_pemohon",
+            "kd_jns_op_pemohon"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pengurangan_permanen": {
+      "name": "pengurangan_permanen",
+      "schema": "",
+      "columns": {
+        "kd_kanwil": {
+          "name": "kd_kanwil",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kppbb": {
+          "name": "kd_kppbb",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_pelayanan": {
+          "name": "thn_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bundel_pelayanan": {
+          "name": "bundel_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut_pelayanan": {
+          "name": "no_urut_pelayanan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_propinsi_pemohon": {
+          "name": "kd_propinsi_pemohon",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2_pemohon": {
+          "name": "kd_dati2_pemohon",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan_pemohon": {
+          "name": "kd_kecamatan_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan_pemohon": {
+          "name": "kd_kelurahan_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok_pemohon": {
+          "name": "kd_blok_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut_pemohon": {
+          "name": "no_urut_pemohon",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op_pemohon": {
+          "name": "kd_jns_op_pemohon",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_peng_permanen_awal": {
+          "name": "thn_peng_permanen_awal",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_peng_permanen_akhir": {
+          "name": "thn_peng_permanen_akhir",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'9999'"
+        },
+        "jns_sk": {
+          "name": "jns_sk",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_sk": {
+          "name": "no_sk",
+          "type": "char(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status_sk_peng_permanen": {
+          "name": "status_sk_peng_permanen",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pct_pengurangan_permanen": {
+          "name": "pct_pengurangan_permanen",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pengurangan_permanen_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk": {
+          "name": "pengurangan_permanen_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk",
+          "columns": [
+            "kd_kanwil",
+            "kd_kppbb",
+            "thn_pelayanan",
+            "bundel_pelayanan",
+            "no_urut_pelayanan",
+            "kd_propinsi_pemohon",
+            "kd_dati2_pemohon",
+            "kd_kecamatan_pemohon",
+            "kd_kelurahan_pemohon",
+            "kd_blok_pemohon",
+            "no_urut_pemohon",
+            "kd_jns_op_pemohon"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pengurangan_pst": {
+      "name": "pengurangan_pst",
+      "schema": "",
+      "columns": {
+        "kd_kanwil": {
+          "name": "kd_kanwil",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kppbb": {
+          "name": "kd_kppbb",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_pelayanan": {
+          "name": "thn_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bundel_pelayanan": {
+          "name": "bundel_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut_pelayanan": {
+          "name": "no_urut_pelayanan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_propinsi_pemohon": {
+          "name": "kd_propinsi_pemohon",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2_pemohon": {
+          "name": "kd_dati2_pemohon",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan_pemohon": {
+          "name": "kd_kecamatan_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan_pemohon": {
+          "name": "kd_kelurahan_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok_pemohon": {
+          "name": "kd_blok_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut_pemohon": {
+          "name": "no_urut_pemohon",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op_pemohon": {
+          "name": "kd_jns_op_pemohon",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_peng_pst": {
+          "name": "thn_peng_pst",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jns_sk": {
+          "name": "jns_sk",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_sk": {
+          "name": "no_sk",
+          "type": "char(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status_sk_peng_pst": {
+          "name": "status_sk_peng_pst",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pct_pengurangan_pst": {
+          "name": "pct_pengurangan_pst",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pengurangan_pst_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk": {
+          "name": "pengurangan_pst_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk",
+          "columns": [
+            "kd_kanwil",
+            "kd_kppbb",
+            "thn_pelayanan",
+            "bundel_pelayanan",
+            "no_urut_pelayanan",
+            "kd_propinsi_pemohon",
+            "kd_dati2_pemohon",
+            "kd_kecamatan_pemohon",
+            "kd_kelurahan_pemohon",
+            "kd_blok_pemohon",
+            "no_urut_pemohon",
+            "kd_jns_op_pemohon"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pst_data_op_baru": {
+      "name": "pst_data_op_baru",
+      "schema": "",
+      "columns": {
+        "kd_kanwil": {
+          "name": "kd_kanwil",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kppbb": {
+          "name": "kd_kppbb",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_pelayanan": {
+          "name": "thn_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bundel_pelayanan": {
+          "name": "bundel_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut_pelayanan": {
+          "name": "no_urut_pelayanan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_propinsi_pemohon": {
+          "name": "kd_propinsi_pemohon",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2_pemohon": {
+          "name": "kd_dati2_pemohon",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan_pemohon": {
+          "name": "kd_kecamatan_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan_pemohon": {
+          "name": "kd_kelurahan_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok_pemohon": {
+          "name": "kd_blok_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut_pemohon": {
+          "name": "no_urut_pemohon",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op_pemohon": {
+          "name": "kd_jns_op_pemohon",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nama_wp_baru": {
+          "name": "nama_wp_baru",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "letak_op_baru": {
+          "name": "letak_op_baru",
+          "type": "varchar(35)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pst_data_op_baru_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk": {
+          "name": "pst_data_op_baru_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk",
+          "columns": [
+            "kd_kanwil",
+            "kd_kppbb",
+            "thn_pelayanan",
+            "bundel_pelayanan",
+            "no_urut_pelayanan",
+            "kd_propinsi_pemohon",
+            "kd_dati2_pemohon",
+            "kd_kecamatan_pemohon",
+            "kd_kelurahan_pemohon",
+            "kd_blok_pemohon",
+            "no_urut_pemohon",
+            "kd_jns_op_pemohon"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pst_detail": {
+      "name": "pst_detail",
+      "schema": "",
+      "columns": {
+        "kd_kanwil": {
+          "name": "kd_kanwil",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kppbb": {
+          "name": "kd_kppbb",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_pelayanan": {
+          "name": "thn_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bundel_pelayanan": {
+          "name": "bundel_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut_pelayanan": {
+          "name": "no_urut_pelayanan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_propinsi_pemohon": {
+          "name": "kd_propinsi_pemohon",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2_pemohon": {
+          "name": "kd_dati2_pemohon",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan_pemohon": {
+          "name": "kd_kecamatan_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan_pemohon": {
+          "name": "kd_kelurahan_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok_pemohon": {
+          "name": "kd_blok_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut_pemohon": {
+          "name": "no_urut_pemohon",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op_pemohon": {
+          "name": "kd_jns_op_pemohon",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_pelayanan": {
+          "name": "kd_jns_pelayanan",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_pajak_permohonan": {
+          "name": "thn_pajak_permohonan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nama_penerima": {
+          "name": "nama_penerima",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'WAJIB PAJAK'"
+        },
+        "catatan_penyerahan": {
+          "name": "catatan_penyerahan",
+          "type": "varchar(75)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status_selesai": {
+          "name": "status_selesai",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "tgl_selesai": {
+          "name": "tgl_selesai",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_seksi_berkas": {
+          "name": "kd_seksi_berkas",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tgl_penyerahan": {
+          "name": "tgl_penyerahan",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nip_penyerah": {
+          "name": "nip_penyerah",
+          "type": "char(18)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pst_detail_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk": {
+          "name": "pst_detail_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk",
+          "columns": [
+            "kd_kanwil",
+            "kd_kppbb",
+            "thn_pelayanan",
+            "bundel_pelayanan",
+            "no_urut_pelayanan",
+            "kd_propinsi_pemohon",
+            "kd_dati2_pemohon",
+            "kd_kecamatan_pemohon",
+            "kd_kelurahan_pemohon",
+            "kd_blok_pemohon",
+            "no_urut_pemohon",
+            "kd_jns_op_pemohon"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pst_lampiran": {
+      "name": "pst_lampiran",
+      "schema": "",
+      "columns": {
+        "kd_kanwil": {
+          "name": "kd_kanwil",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kppbb": {
+          "name": "kd_kppbb",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_pelayanan": {
+          "name": "thn_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bundel_pelayanan": {
+          "name": "bundel_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut_pelayanan": {
+          "name": "no_urut_pelayanan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "l_permohonan": {
+          "name": "l_permohonan",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "l_surat_kuasa": {
+          "name": "l_surat_kuasa",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "l_ktp_wp": {
+          "name": "l_ktp_wp",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "l_sertifikat_tanah": {
+          "name": "l_sertifikat_tanah",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "l_sppt": {
+          "name": "l_sppt",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "l_imb": {
+          "name": "l_imb",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "l_akte_jual_beli": {
+          "name": "l_akte_jual_beli",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "l_sk_pensiun": {
+          "name": "l_sk_pensiun",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "l_sppt_stts": {
+          "name": "l_sppt_stts",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "l_stts": {
+          "name": "l_stts",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "l_sk_pengurangan": {
+          "name": "l_sk_pengurangan",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "l_sk_keberatan": {
+          "name": "l_sk_keberatan",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "l_skkp_pbb": {
+          "name": "l_skkp_pbb",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "l_spmkp_pbb": {
+          "name": "l_spmkp_pbb",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "l_lain_lain": {
+          "name": "l_lain_lain",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pst_lampiran_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_pk": {
+          "name": "pst_lampiran_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_pk",
+          "columns": [
+            "kd_kanwil",
+            "kd_kppbb",
+            "thn_pelayanan",
+            "bundel_pelayanan",
+            "no_urut_pelayanan"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pst_permohonan": {
+      "name": "pst_permohonan",
+      "schema": "",
+      "columns": {
+        "kd_kanwil": {
+          "name": "kd_kanwil",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kppbb": {
+          "name": "kd_kppbb",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_pelayanan": {
+          "name": "thn_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bundel_pelayanan": {
+          "name": "bundel_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut_pelayanan": {
+          "name": "no_urut_pelayanan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_srt_permohonan": {
+          "name": "no_srt_permohonan",
+          "type": "char(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tgl_surat_permohonan": {
+          "name": "tgl_surat_permohonan",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nama_pemohon": {
+          "name": "nama_pemohon",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alamat_pemohon": {
+          "name": "alamat_pemohon",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "keterangan_pst": {
+          "name": "keterangan_pst",
+          "type": "varchar(75)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "catatan_pst": {
+          "name": "catatan_pst",
+          "type": "varchar(75)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status_kolektif": {
+          "name": "status_kolektif",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "tgl_terima_dokumen_wp": {
+          "name": "tgl_terima_dokumen_wp",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "tgl_perkiraan_selesai": {
+          "name": "tgl_perkiraan_selesai",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nip_penerima": {
+          "name": "nip_penerima",
+          "type": "char(18)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pst_permohonan_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_pk": {
+          "name": "pst_permohonan_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_pk",
+          "columns": [
+            "kd_kanwil",
+            "kd_kppbb",
+            "thn_pelayanan",
+            "bundel_pelayanan",
+            "no_urut_pelayanan"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pst_permohonan_pengurangan": {
+      "name": "pst_permohonan_pengurangan",
+      "schema": "",
+      "columns": {
+        "kd_kanwil": {
+          "name": "kd_kanwil",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kppbb": {
+          "name": "kd_kppbb",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_pelayanan": {
+          "name": "thn_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bundel_pelayanan": {
+          "name": "bundel_pelayanan",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut_pelayanan": {
+          "name": "no_urut_pelayanan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_propinsi_pemohon": {
+          "name": "kd_propinsi_pemohon",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2_pemohon": {
+          "name": "kd_dati2_pemohon",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan_pemohon": {
+          "name": "kd_kecamatan_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan_pemohon": {
+          "name": "kd_kelurahan_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok_pemohon": {
+          "name": "kd_blok_pemohon",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut_pemohon": {
+          "name": "no_urut_pemohon",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op_pemohon": {
+          "name": "kd_jns_op_pemohon",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jns_pengurangan": {
+          "name": "jns_pengurangan",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pct_permohonan_pengurangan": {
+          "name": "pct_permohonan_pengurangan",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "pst_permohonan_pengurangan_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk": {
+          "name": "pst_permohonan_pengurangan_kd_kanwil_kd_kppbb_thn_pelayanan_bundel_pelayanan_no_urut_pelayanan_kd_propinsi_pemohon_kd_dati2_pemohon_kd_kecamatan_pemohon_kd_kelurahan_pemohon_kd_blok_pemohon_no_urut_pemohon_kd_jns_op_pemohon_pk",
+          "columns": [
+            "kd_kanwil",
+            "kd_kppbb",
+            "thn_pelayanan",
+            "bundel_pelayanan",
+            "no_urut_pelayanan",
+            "kd_propinsi_pemohon",
+            "kd_dati2_pemohon",
+            "kd_kecamatan_pemohon",
+            "kd_kelurahan_pemohon",
+            "kd_blok_pemohon",
+            "no_urut_pemohon",
+            "kd_jns_op_pemohon"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.range_penyusutan": {
+      "name": "range_penyusutan",
+      "schema": "",
+      "columns": {
+        "kd_range_penyusutan": {
+          "name": "kd_range_penyusutan",
+          "type": "char(1)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nilai_min_penyusutan": {
+          "name": "nilai_min_penyusutan",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nilai_max_penyusutan": {
+          "name": "nilai_max_penyusutan",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ref_dati2": {
+      "name": "ref_dati2",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nm_dati2": {
+          "name": "nm_dati2",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "ref_dati2_kd_propinsi_kd_dati2_pk": {
+          "name": "ref_dati2_kd_propinsi_kd_dati2_pk",
+          "columns": ["kd_propinsi", "kd_dati2"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ref_jns_pelayanan": {
+      "name": "ref_jns_pelayanan",
+      "schema": "",
+      "columns": {
+        "kd_jns_pelayanan": {
+          "name": "kd_jns_pelayanan",
+          "type": "char(2)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nm_jenis_pelayanan": {
+          "name": "nm_jenis_pelayanan",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ref_jpb": {
+      "name": "ref_jpb",
+      "schema": "",
+      "columns": {
+        "kd_jpb": {
+          "name": "kd_jpb",
+          "type": "char(2)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nm_jpb": {
+          "name": "nm_jpb",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ref_kanwil": {
+      "name": "ref_kanwil",
+      "schema": "",
+      "columns": {
+        "kd_kanwil": {
+          "name": "kd_kanwil",
+          "type": "char(2)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nm_kanwil": {
+          "name": "nm_kanwil",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "al_kanwil": {
+          "name": "al_kanwil",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kota_terbit_kanwil": {
+          "name": "kota_terbit_kanwil",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_faksimili": {
+          "name": "no_faksimili",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "no_telpon": {
+          "name": "no_telpon",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ref_kecamatan": {
+      "name": "ref_kecamatan",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nm_kecamatan": {
+          "name": "nm_kecamatan",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "ref_kecamatan_kd_propinsi_kd_dati2_kd_kecamatan_pk": {
+          "name": "ref_kecamatan_kd_propinsi_kd_dati2_kd_kecamatan_pk",
+          "columns": ["kd_propinsi", "kd_dati2", "kd_kecamatan"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ref_kelurahan": {
+      "name": "ref_kelurahan",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_sektor": {
+          "name": "kd_sektor",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'10'"
+        },
+        "nm_kelurahan": {
+          "name": "nm_kelurahan",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_kelurahan": {
+          "name": "no_kelurahan",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kd_pos_kelurahan": {
+          "name": "kd_pos_kelurahan",
+          "type": "varchar(5)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "ref_kelurahan_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_pk": {
+          "name": "ref_kelurahan_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_pk",
+          "columns": ["kd_propinsi", "kd_dati2", "kd_kecamatan", "kd_kelurahan"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ref_kppbb": {
+      "name": "ref_kppbb",
+      "schema": "",
+      "columns": {
+        "kd_kanwil": {
+          "name": "kd_kanwil",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kppbb": {
+          "name": "kd_kppbb",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nm_kppbb": {
+          "name": "nm_kppbb",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "al_kppbb": {
+          "name": "al_kppbb",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kota_terbit_kppbb": {
+          "name": "kota_terbit_kppbb",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_faksimili": {
+          "name": "no_faksimili",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "no_telpon": {
+          "name": "no_telpon",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "ref_kppbb_kd_kanwil_kd_kppbb_pk": {
+          "name": "ref_kppbb_kd_kanwil_kd_kppbb_pk",
+          "columns": ["kd_kanwil", "kd_kppbb"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ref_propinsi": {
+      "name": "ref_propinsi",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nm_propinsi": {
+          "name": "nm_propinsi",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ref_seksi": {
+      "name": "ref_seksi",
+      "schema": "",
+      "columns": {
+        "kd_seksi": {
+          "name": "kd_seksi",
+          "type": "char(2)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nm_seksi": {
+          "name": "nm_seksi",
+          "type": "varchar(75)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_srt_seksi": {
+          "name": "no_srt_seksi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kode_surat_1": {
+          "name": "kode_surat_1",
+          "type": "varchar(5)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kode_surat_2": {
+          "name": "kode_surat_2",
+          "type": "varchar(5)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.sppt": {
+      "name": "sppt",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_pajak_sppt": {
+          "name": "thn_pajak_sppt",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "siklus_sppt": {
+          "name": "siklus_sppt",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kanwil_bank": {
+          "name": "kd_kanwil_bank",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kppbb_bank": {
+          "name": "kd_kppbb_bank",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_bank_tunggal": {
+          "name": "kd_bank_tunggal",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_bank_persepsi": {
+          "name": "kd_bank_persepsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_tp": {
+          "name": "kd_tp",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nm_wp_sppt": {
+          "name": "nm_wp_sppt",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "jln_wp_sppt": {
+          "name": "jln_wp_sppt",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "blok_kav_no_wp_sppt": {
+          "name": "blok_kav_no_wp_sppt",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rw_wp_sppt": {
+          "name": "rw_wp_sppt",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rt_wp_sppt": {
+          "name": "rt_wp_sppt",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kelurahan_wp_sppt": {
+          "name": "kelurahan_wp_sppt",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kota_wp_sppt": {
+          "name": "kota_wp_sppt",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kd_pos_wp_sppt": {
+          "name": "kd_pos_wp_sppt",
+          "type": "varchar(5)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "npwp_sppt": {
+          "name": "npwp_sppt",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "no_persil_sppt": {
+          "name": "no_persil_sppt",
+          "type": "varchar(5)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kd_kls_tanah": {
+          "name": "kd_kls_tanah",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'XXX'"
+        },
+        "thn_awal_kls_tanah": {
+          "name": "thn_awal_kls_tanah",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'1986'"
+        },
+        "kd_kls_bng": {
+          "name": "kd_kls_bng",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'XXX'"
+        },
+        "thn_awal_kls_bng": {
+          "name": "thn_awal_kls_bng",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'1986'"
+        },
+        "tgl_jatuh_tempo_sppt": {
+          "name": "tgl_jatuh_tempo_sppt",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "luas_bumi_sppt": {
+          "name": "luas_bumi_sppt",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "luas_bng_sppt": {
+          "name": "luas_bng_sppt",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "njop_bumi_sppt": {
+          "name": "njop_bumi_sppt",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "njop_bng_sppt": {
+          "name": "njop_bng_sppt",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "njop_sppt": {
+          "name": "njop_sppt",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "njoptkp_sppt": {
+          "name": "njoptkp_sppt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "njkp_sppt": {
+          "name": "njkp_sppt",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pbb_terhutang_sppt": {
+          "name": "pbb_terhutang_sppt",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "faktor_pengurang_sppt": {
+          "name": "faktor_pengurang_sppt",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pbb_yg_harus_dibayar_sppt": {
+          "name": "pbb_yg_harus_dibayar_sppt",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status_pembayaran_sppt": {
+          "name": "status_pembayaran_sppt",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "status_tagihan_sppt": {
+          "name": "status_tagihan_sppt",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "status_cetak_sppt": {
+          "name": "status_cetak_sppt",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "tgl_terbit_sppt": {
+          "name": "tgl_terbit_sppt",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tgl_cetak_sppt": {
+          "name": "tgl_cetak_sppt",
+          "type": "timestamp (0)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "nip_pencetak_sppt": {
+          "name": "nip_pencetak_sppt",
+          "type": "char(18)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "sppt_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_thn_pajak_sppt_pk": {
+          "name": "sppt_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_thn_pajak_sppt_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "thn_pajak_sppt"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.sppt_op_bersama": {
+      "name": "sppt_op_bersama",
+      "schema": "",
+      "columns": {
+        "kd_propinsi": {
+          "name": "kd_propinsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_dati2": {
+          "name": "kd_dati2",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kecamatan": {
+          "name": "kd_kecamatan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kelurahan": {
+          "name": "kd_kelurahan",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_blok": {
+          "name": "kd_blok",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_urut": {
+          "name": "no_urut",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_jns_op": {
+          "name": "kd_jns_op",
+          "type": "char(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "thn_pajak_sppt": {
+          "name": "thn_pajak_sppt",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kls_tanah": {
+          "name": "kd_kls_tanah",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'XXX'"
+        },
+        "thn_awal_kls_tanah": {
+          "name": "thn_awal_kls_tanah",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'1986'"
+        },
+        "kd_kls_bng": {
+          "name": "kd_kls_bng",
+          "type": "char(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'XXX'"
+        },
+        "thn_awal_kls_bng": {
+          "name": "thn_awal_kls_bng",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'1986'"
+        },
+        "luas_bumi_beban_sppt": {
+          "name": "luas_bumi_beban_sppt",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "luas_bng_beban_sppt": {
+          "name": "luas_bng_beban_sppt",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "njop_bumi_beban_sppt": {
+          "name": "njop_bumi_beban_sppt",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "njop_bng_beban_sppt": {
+          "name": "njop_bng_beban_sppt",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "sppt_op_bersama_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_thn_pajak_sppt_pk": {
+          "name": "sppt_op_bersama_kd_propinsi_kd_dati2_kd_kecamatan_kd_kelurahan_kd_blok_no_urut_kd_jns_op_thn_pajak_sppt_pk",
+          "columns": [
+            "kd_propinsi",
+            "kd_dati2",
+            "kd_kecamatan",
+            "kd_kelurahan",
+            "kd_blok",
+            "no_urut",
+            "kd_jns_op",
+            "thn_pajak_sppt"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tempat_pembayaran": {
+      "name": "tempat_pembayaran",
+      "schema": "",
+      "columns": {
+        "kd_kanwil": {
+          "name": "kd_kanwil",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_kppbb": {
+          "name": "kd_kppbb",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_bank_tunggal": {
+          "name": "kd_bank_tunggal",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_bank_persepsi": {
+          "name": "kd_bank_persepsi",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kd_tp": {
+          "name": "kd_tp",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nm_tp": {
+          "name": "nm_tp",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "alamat_tp": {
+          "name": "alamat_tp",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "no_rek_tp": {
+          "name": "no_rek_tp",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "tempat_pembayaran_kd_kanwil_kd_kppbb_kd_bank_tunggal_kd_bank_persepsi_kd_tp_pk": {
+          "name": "tempat_pembayaran_kd_kanwil_kd_kppbb_kd_bank_tunggal_kd_bank_persepsi_kd_tp_pk",
+          "columns": [
+            "kd_kanwil",
+            "kd_kppbb",
+            "kd_bank_tunggal",
+            "kd_bank_persepsi",
+            "kd_tp"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tipe_bangunan": {
+      "name": "tipe_bangunan",
+      "schema": "",
+      "columns": {
+        "tipe_bng": {
+          "name": "tipe_bng",
+          "type": "char(5)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nm_tipe_bng": {
+          "name": "nm_tipe_bng",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "luas_min_tipe_bng": {
+          "name": "luas_min_tipe_bng",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "luas_max_tipe_bng": {
+          "name": "luas_max_tipe_bng",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "faktor_pembagi_tipe_bng": {
+          "name": "faktor_pembagi_tipe_bng",
+          "type": "numeric(8, 4)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
