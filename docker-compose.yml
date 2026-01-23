@@ -2,7 +2,15 @@ version: '3.8'
 
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        - DATABASE_URL=postgresql://postgres:postgres@db:5432/openjkn
+        - BETTER_AUTH_URL=http://localhost:3000
+        - BETTER_AUTH_SECRET=temp-secret-change-in-production
+        - NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
+        - NEXT_PUBLIC_APP_URL=http://localhost:3000
+        - RESEND_API_KEY=
     ports:
       - "3000:3000"
     environment:

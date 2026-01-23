@@ -55,11 +55,32 @@ postgresql://openjkn:<password>@openjkn-db:5432/openjkn
 
 ---
 
-## Step 4: Configure Environment Variables
+## Step 4: Configure Build Arguments and Environment Variables
 
-Add these environment variables in your application settings:
+### Build Arguments (CRITICAL for Docker Compose deployments)
 
-### Required Variables
+If you're using **Docker Compose** service type in Dokploy, you MUST configure build arguments. These are needed during the Docker build process:
+
+```bash
+DATABASE_URL=postgresql://openjkn:<password>@openjkn-db:5432/openjkn
+BETTER_AUTH_URL=https://open-jkn.technosmart.id
+BETTER_AUTH_SECRET=<generate-secret>
+NEXT_PUBLIC_BETTER_AUTH_URL=https://open-jkn.technosmart.id
+NEXT_PUBLIC_APP_URL=https://open-jkn.technosmart.id
+RESEND_API_KEY=
+```
+
+**How to add build arguments in Dokploy:**
+1. Go to your Docker Compose service settings
+2. Look for **"Build Args"** or **"Build Arguments"** section
+3. Add each variable from above as a build argument
+4. Save the configuration
+
+### Runtime Environment Variables
+
+These should also be added as environment variables:
+
+#### Required Variables
 ```bash
 # Database (replace <password> with actual password)
 DATABASE_URL=postgresql://openjkn:<password>@openjkn-db:5432/openjkn
@@ -183,6 +204,33 @@ After deployment completes:
 - Database connection failed → Verify DATABASE_URL is correct
 - Port 3000 already in use → Check for conflicting services
 - Migration failed → Database may not be ready, wait and retry
+
+### Build Error: BETTER_AUTH_SECRET is not set
+
+If you see this error during the Docker build:
+```
+Error: BETTER_AUTH_SECRET is not set. Please set it in your .env.local file.
+Error: Failed to collect page data for /api/notifications
+```
+
+**Solution**: You need to configure **Build Arguments** in Dokploy:
+
+1. Go to your Docker Compose service in Dokploy
+2. Click on **Settings** or **Configuration**
+3. Find the **"Build Args"** section
+4. Add these build arguments:
+   ```
+   DATABASE_URL=postgresql://openjkn:<password>@openjkn-db:5432/openjkn
+   BETTER_AUTH_URL=https://open-jkn.technosmart.id
+   BETTER_AUTH_SECRET=<your-secret>
+   NEXT_PUBLIC_BETTER_AUTH_URL=https://open-jkn.technosmart.id
+   NEXT_PUBLIC_APP_URL=https://open-jkn.technosmart.id
+   RESEND_API_KEY=
+   ```
+5. Save and redeploy
+
+**Why is this needed?**
+The Docker build process runs Next.js data collection, which requires these environment variables at build time, not just at runtime.
 
 ### Database Connection Issues
 1. Verify PostgreSQL service is running

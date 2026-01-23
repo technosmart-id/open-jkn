@@ -6,6 +6,23 @@ WORKDIR /app
 FROM base AS builder
 # Install git for lefthook (but we'll skip prepare scripts in Docker)
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+
+# Build arguments for environment variables
+ARG DATABASE_URL
+ARG BETTER_AUTH_URL
+ARG BETTER_AUTH_SECRET
+ARG NEXT_PUBLIC_BETTER_AUTH_URL
+ARG NEXT_PUBLIC_APP_URL
+ARG RESEND_API_KEY
+
+# Set environment variables for build time
+ENV DATABASE_URL=${DATABASE_URL}
+ENV BETTER_AUTH_URL=${BETTER_AUTH_URL}
+ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+ENV NEXT_PUBLIC_BETTER_AUTH_URL=${NEXT_PUBLIC_BETTER_AUTH_URL}
+ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+ENV RESEND_API_KEY=${RESEND_API_KEY}
+
 COPY package.json bun.lock ./
 # Skip prepare scripts in Docker (git hooks not needed in production)
 RUN bun install --frozen-lockfile --ignore-scripts
