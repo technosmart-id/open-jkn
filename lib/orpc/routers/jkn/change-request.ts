@@ -122,17 +122,9 @@ export const changeRequestRouter = {
       })
     )
     .handler(async ({ input, context }) => {
-      // Generate request number
-      const timestamp = Date.now();
-      const random = Math.floor(Math.random() * 10_000)
-        .toString()
-        .padStart(4, "0");
-      const requestNumber = `CHR${timestamp}${random}`;
-
       const [request] = await db
         .insert(dataChangeRequest)
         .values({
-          requestNumber,
           participantId: input.participantId,
           changeType: input.changeType,
           previousData: input.previousData,
