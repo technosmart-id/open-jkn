@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Enable standalone output for Docker deployment
+  output: "standalone",
   // Silence Turbopack warning about webpack config
   turbopack: {},
   // Use Turbopack's serverExternalPackages for externals
