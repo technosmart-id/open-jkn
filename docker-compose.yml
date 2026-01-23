@@ -11,8 +11,7 @@ services:
         - NEXT_PUBLIC_BETTER_AUTH_URL=https://open-jkn.technosmart.id
         - NEXT_PUBLIC_APP_URL=https://open-jkn.technosmart.id
         - RESEND_API_KEY=
-    ports:
-      - "3000:3000"
+    # Remove port mapping - Dokploy handles reverse proxying
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/openjkn
       - BETTER_AUTH_URL=https://open-jkn.technosmart.id
