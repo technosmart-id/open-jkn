@@ -28,6 +28,10 @@ COPY package.json bun.lock ./
 RUN bun install --ignore-scripts
 
 COPY . .
+
+# Generate drizzle.config.json for production (drizzle-kit can't use TypeScript config)
+RUN node scripts/generate-drizzle-config.js
+
 RUN bun run build
 
 # Stage 3: Runner
@@ -43,9 +47,13 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-# Copy node_modules for drizzle-kit (needed for migrations)
+# Copy node_modules and drizzle config for migrations
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/drizzle.config.json ./drizzle.config.json
+
+# Copy migration files and schema
+COPY --from=builder /app/lib/db ./lib/db
 
 # Create uploads directory with proper permissions
 RUN mkdir -p /app/uploads && chown -R nextjs:nodejs /app/uploads
