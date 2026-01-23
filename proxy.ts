@@ -2,10 +2,10 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 /**
- * Middleware to protect authenticated routes
+ * Proxy to protect authenticated routes
  * Redirects unauthenticated users to login page
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public routes that don't require authentication
@@ -53,7 +53,7 @@ export function middleware(request: NextRequest) {
 }
 
 /**
- * Matcher configuration for protected routes
+ * Matcher configuration for proxy
  * Exclude auth routes, static files, and API routes
  */
 export const config = {
