@@ -8,20 +8,10 @@ async function handleRequest(request: Request) {
   try {
     const context = await createContext();
 
-    const { response, error } = await handler.handle(request, {
+    const { response } = await handler.handle(request, {
       prefix: "/api/rpc",
       context,
     });
-
-    // Log ORPC errors
-    if (error) {
-      console.error("[RPC] Error handling request:", {
-        path: request.url,
-        error: error.message,
-        stack: error.stack,
-        cause: error.cause,
-      });
-    }
 
     return response ?? new Response("Not Found", { status: 404 });
   } catch (err) {
