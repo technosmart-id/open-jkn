@@ -33,6 +33,9 @@ export function proxy(request: NextRequest) {
     request.cookies.get("__Secure-better-auth.session_token") ||
     request.cookies.get("better-auth.session_token");
 
+  // Check if this is an API route
+  const isApiRoute = pathname.startsWith("/api");
+
   // Debug logging
   console.log(
     "[Proxy] Path:",
@@ -40,11 +43,21 @@ export function proxy(request: NextRequest) {
     "Has session:",
     !!sessionToken,
     "Is public:",
-    isPublicRoute
+    isPublicRoute,
+    "Is API:",
+    isApiRoute
   );
 
   // If user is not authenticated and trying to access protected route
   if (!(sessionToken || isPublicRoute)) {
+    // For API routes, return 401 Unauthorized instead of redirecting
+    if (isApiRoute) {
+      console.log("[Proxy] API route blocked - returning 401");
+      return NextResponse.json(
+        { error: "Unauthorized", message: "Authentication required" },
+        { status: 401 }
+      );
+    }
     console.log("[Proxy] Redirecting to login");
     const url = request.nextUrl.clone();
     url.pathname = "/login";
