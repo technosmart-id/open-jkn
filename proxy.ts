@@ -2,11 +2,10 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 /**
- * Middleware to protect authenticated routes
- * NOTE: Using middleware.ts as workaround for Next.js 16 proxy.ts bug
- * https://github.com/vercel/next.js/issues/86122
+ * Proxy to protect authenticated routes
+ * Redirects unauthenticated users to login page
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public routes that don't require authentication
@@ -34,7 +33,7 @@ export function middleware(request: NextRequest) {
 
   // Debug logging
   console.log(
-    "[Middleware] Path:",
+    "[Proxy] Path:",
     pathname,
     "Has session:",
     !!sessionToken,
@@ -44,7 +43,7 @@ export function middleware(request: NextRequest) {
 
   // If user is not authenticated and trying to access protected route
   if (!(sessionToken || isPublicRoute)) {
-    console.log("[Middleware] Redirecting to login");
+    console.log("[Proxy] Redirecting to login");
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("redirect", pathname);
@@ -53,7 +52,7 @@ export function middleware(request: NextRequest) {
 
   // If user is authenticated and trying to access public route (login/signup)
   if (sessionToken && isPublicRoute) {
-    console.log("[Middleware] Redirecting to dashboard");
+    console.log("[Proxy] Redirecting to dashboard");
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
@@ -63,7 +62,7 @@ export function middleware(request: NextRequest) {
 }
 
 /**
- * Matcher configuration for middleware
+ * Matcher configuration for proxy
  * Exclude auth routes, static files, and API routes
  */
 export const config = {
