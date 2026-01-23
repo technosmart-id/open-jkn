@@ -1,0 +1,50 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - link "JKW" [ref=e5] [cursor=pointer]:
+      - /url: /
+      - img [ref=e7]
+      - text: JKW
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]:
+          - generic [ref=e12]: Buat Akun Admin JKN
+          - generic [ref=e13]: Masukkan email Anda untuk membuat akun admin
+        - generic [ref=e16]:
+          - paragraph [ref=e17]: Failed to create account
+          - group [ref=e18]:
+            - generic [ref=e19]: Nama Lengkap
+            - textbox "Nama Lengkap" [ref=e20]: Deployment Admin
+          - group [ref=e21]:
+            - generic [ref=e22]: Email
+            - textbox "Email" [ref=e23]:
+              - /placeholder: admin@jkn.local
+              - text: admin_1769149190334@technosmart.id
+          - group [ref=e24]:
+            - group [ref=e25]:
+              - group [ref=e26]:
+                - generic [ref=e27]: Password
+                - textbox "Password" [ref=e28]: password123
+              - group [ref=e29]:
+                - generic [ref=e30]: Konfirmasi Password
+                - textbox "Konfirmasi Password" [ref=e31]: password123
+            - paragraph [ref=e32]: Minimal 8 karakter.
+          - group [ref=e33]:
+            - button "Buat Akun" [ref=e34]
+            - paragraph [ref=e35]:
+              - text: Sudah punya akun?
+              - link "Masuk" [ref=e36] [cursor=pointer]:
+                - /url: /login
+      - paragraph [ref=e37]:
+        - text: Dengan melanjutkan, Anda menyetujui
+        - link "Syarat & Ketentuan" [ref=e38] [cursor=pointer]:
+          - /url: /terms
+        - text: dan
+        - link "Kebijakan Privasi" [ref=e39] [cursor=pointer]:
+          - /url: /privacy
+        - text: .
+  - region "Notifications alt+T"
+  - alert [ref=e40]
+```
