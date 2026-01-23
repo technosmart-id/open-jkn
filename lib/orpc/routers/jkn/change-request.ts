@@ -191,7 +191,18 @@ export const changeRequestRouter = {
       }
 
       // Apply the changes based on change type
-      const { newData, changeType, participantId } = request;
+      const {
+        newData,
+        changeType,
+        participantId: requestParticipantId,
+      } = request;
+
+      if (!requestParticipantId) {
+        throw new Error("Participant ID is required to approve this request");
+      }
+
+      // TypeScript needs this reassignment for proper type narrowing
+      const participantId = requestParticipantId;
 
       // Update participant with new data
       switch (changeType) {

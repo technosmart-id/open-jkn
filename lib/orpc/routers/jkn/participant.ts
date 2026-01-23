@@ -351,6 +351,12 @@ export const participantRouter = {
       ) {
         await db.insert(employmentIdentity).values({
           ...employmentIdentityData,
+          employmentStartDate: employmentIdentityData.employmentStartDate
+            ? new Date(employmentIdentityData.employmentStartDate)
+            : undefined,
+          gradeStartDate: employmentIdentityData.gradeStartDate
+            ? new Date(employmentIdentityData.gradeStartDate)
+            : undefined,
           participantId: newParticipant.id,
         });
       }
@@ -362,7 +368,7 @@ export const participantRouter = {
           primaryFacilityId,
           dentalFacilityId,
           treatmentClass: input.treatmentClass,
-          effectiveDate: new Date().toISOString(),
+          effectiveDate: new Date(),
         });
       }
 
@@ -371,6 +377,10 @@ export const participantRouter = {
         for (const member of familyMembers) {
           await db.insert(familyMember).values({
             ...member,
+            birthDate: new Date(member.birthDate),
+            studentVerificationDate: member.studentVerificationDate
+              ? new Date(member.studentVerificationDate)
+              : undefined,
             headOfFamilyId: newParticipant.id,
           });
         }

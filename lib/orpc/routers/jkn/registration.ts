@@ -199,7 +199,7 @@ export const registrationRouter = {
         verifiedAt?: Date;
         virtualAccountCreated?: boolean;
         virtualAccountCreatedAt?: Date;
-        firstPaymentDeadline?: string;
+        firstPaymentDeadline?: Date;
         rejectionReason?: string;
       };
 
@@ -219,7 +219,7 @@ export const registrationRouter = {
         // Set payment deadline to 30 days from now
         const deadline = new Date();
         deadline.setDate(deadline.getDate() + 30);
-        updateData.firstPaymentDeadline = deadline.toISOString();
+        updateData.firstPaymentDeadline = deadline;
       }
 
       if (input.status === "DITOLAK") {
@@ -243,10 +243,7 @@ export const registrationRouter = {
       .where(
         and(
           eq(registrationApplication.status, "MENUNGGU_PEMBAYARAN"),
-          lt(
-            registrationApplication.firstPaymentDeadline,
-            new Date().toISOString()
-          )
+          lt(registrationApplication.firstPaymentDeadline, new Date())
         )
       );
 

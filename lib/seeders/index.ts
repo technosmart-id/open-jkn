@@ -1,4 +1,4 @@
-import { faker } from "@faker-js/faker";
+import { faker } from "@faker-js/faker/locale/id_ID";
 import { db } from "@/lib/db";
 import {
   bankInformation,
@@ -12,9 +12,6 @@ import {
   participantHealthcareFacility,
   registrationApplication,
 } from "@/lib/db/schema/jkn";
-
-// Set faker to Indonesian locale
-faker.locale = "id_ID";
 
 const SEGMENTS = [
   "PU_PNS_PUSAT",
@@ -148,10 +145,10 @@ function createFamilyMember(
     headOfFamilyId: participantIndex + 1,
     fullName: faker.person.fullName(),
     identityNumber: faker.string.numeric(16),
-    relationship: isChild ? "ANAK" : "ISTRI",
-    birthDate: faker.date.birthdate({ min: 1, max: 25 }),
+    relationship: isChild ? "ANAK_TANGGUNGAN" : "ISTRI",
+    birthDate: faker.date.birthdate({ mode: "age", min: 1, max: 25 }),
     isStudent: isChild && randomBoolean(),
-    gender: faker.person.sex() === "female" ? "P" : "L",
+    gender: faker.person.sex() === "female" ? "PEREMPUAN" : "LAKI_LAKI",
     birthPlace: city,
     phoneNumber: faker.phone.number(),
     createdAt: new Date(),
@@ -216,10 +213,12 @@ function createParticipantData(
     familyCardNumber: faker.string.numeric(16),
     identityNumber: faker.string.numeric(16),
     fullName: faker.person.fullName(),
-    gender: faker.person.sex() === "female" ? "P" : "L",
+    gender: faker.person.sex() === "female" ? "PEREMPUAN" : "LAKI_LAKI",
     bloodType: "O" as const,
     birthPlace: city,
-    birthDate: faker.date.birthdate({ min: 18, max: 80 }),
+    birthDate: faker.date
+      .birthdate({ mode: "age", min: 18, max: 80 })
+      .toISOString(),
     religion: "ISLAM" as const,
     maritalStatus: "KAWIN" as const,
     phoneNumber: faker.phone.number(),

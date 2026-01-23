@@ -117,18 +117,13 @@ export const paymentRouter = {
       })
     )
     .handler(async ({ input }) => {
-      // Check if payment is late (after day 10)
+      // Check arrears and calculate penalty
       const today = new Date();
-      const dayOfMonth = today.getDate();
-      const paidByDayOfMonth = dayOfMonth <= 10;
-
-      // Check arrears
       const currentMonth = today.getMonth() + 1;
       const currentYear = today.getFullYear();
       const paymentMonth = input.periodMonth;
       const paymentYear = input.periodYear;
 
-      let monthsInArrears = 0;
       let penaltyAmount = "0";
 
       if (
@@ -137,7 +132,7 @@ export const paymentRouter = {
       ) {
         // Calculate months in arrears
         const yearDiff = currentYear - paymentYear;
-        monthsInArrears = yearDiff * 12 + (currentMonth - paymentMonth);
+        const monthsInArrears = yearDiff * 12 + (currentMonth - paymentMonth);
 
         // Calculate penalty: 2.5% per month in arrears
         const amount = Number.parseFloat(input.amount);
@@ -152,6 +147,14 @@ export const paymentRouter = {
         .padStart(4, "0");
       const paymentNumber = `PAY${timestamp}${random}`;
 
+      // Calculate total amount
+      const adminFeeValue = input.adminFee || "0";
+      const totalAmount = (
+        Number.parseFloat(input.amount) +
+        Number.parseFloat(adminFeeValue) +
+        Number.parseFloat(penaltyAmount)
+      ).toFixed(2);
+
       const [payment] = await db
         .insert(contributionPayment)
         .values({
@@ -161,12 +164,11 @@ export const paymentRouter = {
           periodYear: input.periodYear,
           amount: input.amount,
           adminFee: input.adminFee,
+          totalAmount,
           paymentMethod: input.paymentMethod,
           bankName: input.bankName,
           virtualAccountNumber: input.virtualAccountNumber,
           status: "PENDING",
-          paidByDayOfMonth,
-          monthsInArrears,
           penaltyAmount,
         })
         .returning();
@@ -187,7 +189,7 @@ export const paymentRouter = {
         .update(contributionPayment)
         .set({
           status: "PAID",
-          paymentDate: input.paymentDate,
+          paymentDate: new Date(input.paymentDate),
           paymentReference: input.paymentReference,
           updatedAt: new Date(),
         })
