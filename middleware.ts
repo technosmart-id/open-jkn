@@ -2,10 +2,10 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 /**
- * Proxy to protect authenticated routes
+ * Middleware to protect authenticated routes
  * Redirects unauthenticated users to login page
  */
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public routes that don't require authentication
@@ -29,7 +29,10 @@ export function proxy(request: NextRequest) {
   }
 
   // Check for session cookie (Better Auth uses "better-auth.session_token")
-  const sessionToken = request.cookies.get("better-auth.session_token");
+  // Also check for the legacy "session_token" cookie
+  const sessionToken =
+    request.cookies.get("better-auth.session_token") ||
+    request.cookies.get("session_token");
 
   // If user is not authenticated and trying to access protected route
   if (!(sessionToken || isPublicRoute)) {
@@ -39,7 +42,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // If user is authenticated and trying to access public route
+  // If user is authenticated and trying to access public route (login/signup)
   if (sessionToken && isPublicRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
