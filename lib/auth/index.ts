@@ -78,14 +78,6 @@ export const auth = betterAuth({
     },
   },
 
-  advanced: {
-    cookiePrefix: "better-auth",
-    crossSubDomainCookies: {
-      enabled: false,
-    },
-    useSecureCookies: process.env.NODE_ENV === "production",
-  },
-
   plugins,
 });
 
