@@ -23,6 +23,9 @@ services:
         condition: service_healthy
     volumes:
       - uploads:/app/uploads
+    networks:
+      - default
+      - dokploy-network
 
   db:
     image: postgres:16-alpine
@@ -41,3 +44,8 @@ services:
 volumes:
   uploads:
   postgres_data:
+
+networks:
+  default:
+  dokploy-network:
+    external: true
