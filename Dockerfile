@@ -4,6 +4,8 @@ WORKDIR /app
 
 # Stage 2: Builder
 FROM base AS builder
+# Install git for lefthook
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
@@ -15,8 +17,8 @@ FROM base AS runner
 ENV NODE_ENV=production
 
 # Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN groupadd --system --gid 1001 nodejs
+RUN useradd --system --uid 1001 --gid nodejs nextjs
 
 # Copy necessary files
 COPY --from=builder /app/public ./public
