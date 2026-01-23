@@ -28,8 +28,10 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for session cookie (Better Auth uses "better-auth.session_token")
-  const sessionToken = request.cookies.get("better-auth.session_token");
+  // Check for session cookie (Better Auth uses "__Secure-better-auth.session_token" in production)
+  const sessionToken =
+    request.cookies.get("__Secure-better-auth.session_token") ||
+    request.cookies.get("better-auth.session_token");
 
   // Debug logging
   console.log(
