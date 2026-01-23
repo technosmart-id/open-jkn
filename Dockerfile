@@ -25,7 +25,7 @@ ENV RESEND_API_KEY=${RESEND_API_KEY}
 
 COPY package.json bun.lock ./
 # Skip prepare scripts in Docker (git hooks not needed in production)
-RUN bun install --frozen-lockfile --ignore-scripts
+RUN bun install --ignore-scripts
 
 COPY . .
 RUN bun run build
