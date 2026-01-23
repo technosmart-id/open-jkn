@@ -30,17 +30,23 @@ export const protectedProcedure = base.use(({ context, next }) => {
 
 // Helper to create context from request headers
 export async function createContext(): Promise<Context> {
-  const headersList = await headers();
-  const session = await auth.api.getSession({
-    headers: headersList,
-  });
+  try {
+    const headersList = await headers();
+    const session = await auth.api.getSession({
+      headers: headersList,
+    });
 
-  if (!session) {
+    if (!session) {
+      return { user: null, session: null };
+    }
+
+    return {
+      user: session.user as User,
+      session: session.session as Session,
+    };
+  } catch (error) {
+    // Log error for debugging
+    console.error("[Context] Error creating context:", error);
     return { user: null, session: null };
   }
-
-  return {
-    user: session.user as User,
-    session: session.session as Session,
-  };
 }
