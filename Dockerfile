@@ -4,10 +4,11 @@ WORKDIR /app
 
 # Stage 2: Builder
 FROM base AS builder
-# Install git for lefthook
+# Install git for lefthook (but we'll skip prepare scripts in Docker)
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+# Skip prepare scripts in Docker (git hooks not needed in production)
+RUN bun install --frozen-lockfile --ignore-scripts
 
 COPY . .
 RUN bun run build
