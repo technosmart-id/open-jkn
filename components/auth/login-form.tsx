@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,12 +22,19 @@ import { Spinner } from "@/components/ui/spinner";
 import { signIn } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 
+const DEMO_CREDENTIALS = {
+  email: "admin@jkn.go.id",
+  password: "admin123456",
+} as const;
+
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string>();
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   const handleSocialSignIn = async (provider: "google") => {
     setIsPending(true);
@@ -66,25 +73,20 @@ export function LoginForm({
     }
   };
 
+  const fillDemoCredentials = () => {
+    if (emailRef.current) {
+      emailRef.current.value = DEMO_CREDENTIALS.email;
+      // Trigger change event for React to detect the value change
+      emailRef.current.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    if (passwordRef.current) {
+      passwordRef.current.value = DEMO_CREDENTIALS.password;
+      passwordRef.current.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      {/* Default credentials info card */}
-      <Card className="border-blue-500 bg-blue-50 dark:bg-blue-950">
-        <CardHeader className="pb-3 text-center">
-          <CardTitle className="font-medium text-blue-900 text-sm dark:text-blue-100">
-            Default Admin Credentials
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="text-center text-sm">
-          <p className="text-blue-800 dark:text-blue-200">
-            <strong>Email:</strong> admin@jkn.go.id
-          </p>
-          <p className="text-blue-800 dark:text-blue-200">
-            <strong>Password:</strong> admin123456
-          </p>
-        </CardContent>
-      </Card>
-
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Open JKN</CardTitle>
@@ -132,6 +134,7 @@ export function LoginForm({
                   id="email"
                   name="email"
                   placeholder="admin@jkn.local"
+                  ref={emailRef}
                   required
                   type="email"
                 />
@@ -150,6 +153,7 @@ export function LoginForm({
                   disabled={isPending}
                   id="password"
                   name="password"
+                  ref={passwordRef}
                   required
                   type="password"
                 />
@@ -174,9 +178,23 @@ export function LoginForm({
               </Field>
             </FieldGroup>
           </form>
+
+          <div className="mt-6 flex flex-col items-center gap-2">
+            <p className="text-muted-foreground text-sm">Akun Demo:</p>
+            <Button
+              disabled={isPending}
+              onClick={fillDemoCredentials}
+              size="sm"
+              type="button"
+              variant="outline"
+            >
+              Isi dengan akun demo
+            </Button>
+          </div>
         </CardContent>
       </Card>
-      <FieldDescription className="px-6 text-center">
+      {/* Intentionally hidden for future use */}
+      <FieldDescription className="hidden px-6 text-center">
         By clicking continue, you agree to our{" "}
         <Link className="underline underline-offset-4" href="/terms">
           Terms of Service
