@@ -520,42 +520,38 @@ export async function clearAllData() {
   // Import sql for raw SQL condition
   const { sql } = await import("drizzle-orm");
 
+  // Helper function to safely delete from a table
+  async function safeDelete(
+    table: ReturnType<typeof pgTable>,
+    tableName: string
+  ) {
+    try {
+      await db.delete(table).where(sql`1=1`);
+      console.log(`  ✓ Cleared ${tableName}`);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("does not exist")) {
+        console.log(`  ⊗ Table ${tableName} does not exist yet, skipping...`);
+      } else {
+        throw error;
+      }
+    }
+  }
+
   // Use Drizzle delete with where(sql) to delete all rows
   // Delete in correct order: child tables first, then parent tables
-  await db.delete(contributionPayment).where(sql`1=1`);
-  await db.delete(dataChangeRequest).where(sql`1=1`);
-  await db.delete(registrationApplication).where(sql`1=1`);
-  await db.delete(participantHealthcareFacility).where(sql`1=1`);
-  await db.delete(bankInformation).where(sql`1=1`);
-  await db.delete(familyMember).where(sql`1=1`);
-  await db.delete(employmentIdentity).where(sql`1=1`);
-  await db.delete(participant).where(sql`1=1`);
-  await db.delete(dentalFacility).where(sql`1=1`);
-  await db.delete(healthcareFacility).where(sql`1=1`);
-
-  // Reset sequences to restart IDs from 1
-  await db.execute(
-    sql`ALTER SEQUENCE contribution_payment_id_seq RESTART WITH 1`
+  await safeDelete(contributionPayment, "contribution_payment");
+  await safeDelete(dataChangeRequest, "data_change_request");
+  await safeDelete(registrationApplication, "registration_application");
+  await safeDelete(
+    participantHealthcareFacility,
+    "participant_healthcare_facility"
   );
-  await db.execute(
-    sql`ALTER SEQUENCE data_change_request_id_seq RESTART WITH 1`
-  );
-  await db.execute(
-    sql`ALTER SEQUENCE registration_application_id_seq RESTART WITH 1`
-  );
-  await db.execute(
-    sql`ALTER SEQUENCE participant_healthcare_facility_id_seq RESTART WITH 1`
-  );
-  await db.execute(sql`ALTER SEQUENCE bank_information_id_seq RESTART WITH 1`);
-  await db.execute(sql`ALTER SEQUENCE family_member_id_seq RESTART WITH 1`);
-  await db.execute(
-    sql`ALTER SEQUENCE employment_identity_id_seq RESTART WITH 1`
-  );
-  await db.execute(sql`ALTER SEQUENCE participant_id_seq RESTART WITH 1`);
-  await db.execute(sql`ALTER SEQUENCE dental_facility_id_seq RESTART WITH 1`);
-  await db.execute(
-    sql`ALTER SEQUENCE healthcare_facility_id_seq RESTART WITH 1`
-  );
+  await safeDelete(bankInformation, "bank_information");
+  await safeDelete(familyMember, "family_member");
+  await safeDelete(employmentIdentity, "employment_identity");
+  await safeDelete(participant, "participant");
+  await safeDelete(dentalFacility, "dental_facility");
+  await safeDelete(healthcareFacility, "healthcare_facility");
 
   console.log("✓ Cleared all JKN data");
 }
