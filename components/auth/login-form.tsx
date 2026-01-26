@@ -180,15 +180,13 @@ export function LoginForm({
           </form>
 
           <div className="mt-6 flex flex-col items-center gap-2">
-            <p className="text-muted-foreground text-sm">Akun Demo:</p>
             <Button
               disabled={isPending}
               onClick={fillDemoCredentials}
               size="sm"
-              type="button"
-              variant="outline"
+              variant="ghost"
             >
-              Isi dengan akun demo
+              Demo: admin@jkn.go.id / admin123456
             </Button>
           </div>
         </CardContent>
