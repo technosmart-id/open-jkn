@@ -25,8 +25,8 @@ type App = {
 
 const apps: App[] = [
   {
-    name: "JKW",
-    description: "JKN KW - Aplikasi JKN Palsu",
+    name: "Open JKN",
+    description: "Open JKN - Aplikasi Simulasi JKN untuk edukasi",
     href: "/dashboard",
   },
   // TODO: Enable for future release

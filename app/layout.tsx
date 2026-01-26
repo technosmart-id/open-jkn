@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "JKW",
-  description: "JKN KW - Aplikasi Manajemen BPJS Kesehatan",
+  title: "Open JKN",
+  description: "Open JKN - Simulasi JKN untuk edukasi",
 };
 
 export default function RootLayout({

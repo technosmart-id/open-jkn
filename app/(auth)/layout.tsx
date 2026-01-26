@@ -24,7 +24,7 @@ export default function AuthLayout({
           <div className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <GalleryVerticalEnd className="size-4" />
           </div>
-          JKW
+          Open JKN
         </Link>
         {children}
       </div>
