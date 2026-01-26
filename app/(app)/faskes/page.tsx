@@ -26,14 +26,14 @@ import { orpc } from "@/lib/orpc/client";
 export default function FacilityListPage() {
   const [search, setSearch] = useState("");
   const [type, setType] = useState<string>("all");
-  const [city, setCity] = useState("");
+  const [city, setCity] = useState<string>("all");
 
   const { data: healthcareFacilities, isFetching } = useQuery(
     orpc.jkn.facility.listHealthcareFacilities.queryOptions({
       input: {
         search: search || undefined,
         type: type === "all" ? undefined : type,
-        city: city || undefined,
+        city: city === "all" ? undefined : city,
         limit: 100,
       },
     })
@@ -75,7 +75,7 @@ export default function FacilityListPage() {
             <SelectValue placeholder="Kota/Kabupaten" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Semua Kota</SelectItem>
+            <SelectItem value="all">Semua Kota</SelectItem>
             <SelectItem value="JAKARTA">Jakarta</SelectItem>
             <SelectItem value="BANDUNG">Bandung</SelectItem>
             <SelectItem value="SURABAYA">Surabaya</SelectItem>
