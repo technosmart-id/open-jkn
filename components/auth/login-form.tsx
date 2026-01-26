@@ -70,10 +70,8 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">JKN KW</CardTitle>
-          <CardDescription>
-            Aplikasi boleh palsu, tapi ijazah tetap asli
-          </CardDescription>
+          <CardTitle className="text-xl">Open JKN</CardTitle>
+          <CardDescription>Aplikasi Simulasi JKN untuk edukasi</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleEmailSignIn}>
