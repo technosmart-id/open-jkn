@@ -517,23 +517,23 @@ export async function seedChangeRequests(count = 20) {
 export async function clearAllData() {
   console.log("Clearing all JKN data...");
 
-  // Import sql for raw SQL queries
+  // Import sql for raw SQL condition
   const { sql } = await import("drizzle-orm");
 
-  // Use DELETE FROM with proper ordering to respect foreign key constraints
-  // Child tables first, then parent tables
-  await db.execute(sql`DELETE FROM "contribution_payment"`);
-  await db.execute(sql`DELETE FROM "data_change_request"`);
-  await db.execute(sql`DELETE FROM "registration_application"`);
-  await db.execute(sql`DELETE FROM "participant_healthcare_facility"`);
-  await db.execute(sql`DELETE FROM "bank_information"`);
-  await db.execute(sql`DELETE FROM "family_member"`);
-  await db.execute(sql`DELETE FROM "employment_identity"`);
-  await db.execute(sql`DELETE FROM "participant"`);
-  await db.execute(sql`DELETE FROM "dental_facility"`);
-  await db.execute(sql`DELETE FROM "healthcare_facility"`);
+  // Use Drizzle delete with where(sql) to delete all rows
+  // Delete in correct order: child tables first, then parent tables
+  await db.delete(contributionPayment).where(sql`1=1`);
+  await db.delete(dataChangeRequest).where(sql`1=1`);
+  await db.delete(registrationApplication).where(sql`1=1`);
+  await db.delete(participantHealthcareFacility).where(sql`1=1`);
+  await db.delete(bankInformation).where(sql`1=1`);
+  await db.delete(familyMember).where(sql`1=1`);
+  await db.delete(employmentIdentity).where(sql`1=1`);
+  await db.delete(participant).where(sql`1=1`);
+  await db.delete(dentalFacility).where(sql`1=1`);
+  await db.delete(healthcareFacility).where(sql`1=1`);
 
-  // Reset sequences
+  // Reset sequences to restart IDs from 1
   await db.execute(
     sql`ALTER SEQUENCE contribution_payment_id_seq RESTART WITH 1`
   );
