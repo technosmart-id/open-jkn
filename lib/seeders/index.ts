@@ -526,31 +526,32 @@ export async function seedChangeRequests(count = 20) {
 export async function seedAdminUser() {
   console.log("Seeding default admin user...");
 
-  // Use scrypt for password hashing (Better Auth default)
+  // Use scryptAsync for password hashing (Better Auth default)
   // Format: {saltHex}:{derivedKeyHex}
-  const { scrypt } = await import("@noble/hashes/scrypt.js");
-  const { randomBytes } = await import("node:crypto");
+  const { scryptAsync } = await import("@noble/hashes/scrypt.js");
+  const { hex } = await import("@better-auth/utils/hex");
+  const crypto = await import("node:crypto");
 
   const userId = generateId();
   const accountId = generateId();
 
   // Generate 16-byte salt and encode as hex
-  const saltBuffer = randomBytes(16);
-  const saltHex = saltBuffer.toString("hex");
+  const salt = hex.encode(crypto.webcrypto.getRandomValues(new Uint8Array(16)));
 
   // Normalize password with NFKC (Better Auth requirement)
-  const normalizedPassword = DEFAULT_ADMIN.password.normalize("NFKC");
+  const password = DEFAULT_ADMIN.password.normalize("NFKC");
 
-  // Derive key using scrypt with Better Auth's parameters
-  const derivedKey = scrypt(normalizedPassword, saltBuffer, {
+  // Derive key using scryptAsync with Better Auth's parameters
+  const key = await scryptAsync(password, salt, {
     N: 16_384,
     r: 16,
     p: 1,
     dkLen: 64,
+    maxmem: 128 * 16_384 * 16 * 2,
   });
 
   // Format as {saltHex}:{derivedKeyHex}
-  const passwordHash = `${saltHex}:${Buffer.from(derivedKey).toString("hex")}`;
+  const passwordHash = `${salt}:${hex.encode(key)}`;
 
   // Check if admin user already exists using raw SQL
   const { sql } = await import("drizzle-orm");
