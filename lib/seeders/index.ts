@@ -526,12 +526,21 @@ export async function seedChangeRequests(count = 20) {
 export async function seedAdminUser() {
   console.log("Seeding default admin user...");
 
-  // Use argon2 for password hashing (Better Auth compatible)
-  const { hash } = await import("@node-rs/argon2");
+  // Use scrypt for password hashing (Better Auth default)
+  const { scrypt } = await import("@noble/hashes/scrypt.js");
+  const { randomBytes } = await import("node:crypto");
 
   const userId = generateId();
   const accountId = generateId();
-  const hashedPassword = await hash(DEFAULT_ADMIN.password);
+  const salt = randomBytes(16).toString("base64");
+  const passwordBuffer = Buffer.from(DEFAULT_ADMIN.password);
+  const hashedPassword = scrypt(passwordBuffer, Buffer.from(salt, "base64"), {
+    N: 16_384,
+    r: 16,
+    p: 1,
+    dkLen: 64,
+  });
+  const passwordHash = `$scrypt$ln=16,r=16,p=1$${salt}$${Buffer.from(hashedPassword).toString("base64")}`;
 
   // Check if admin user already exists using raw SQL
   const { sql } = await import("drizzle-orm");
@@ -564,7 +573,7 @@ export async function seedAdminUser() {
     userId,
     accountId: userId,
     providerId: "credential",
-    password: hashedPassword,
+    password: passwordHash,
     createdAt: new Date(),
     updatedAt: new Date(),
   });
