@@ -527,20 +527,30 @@ export async function seedAdminUser() {
   console.log("Seeding default admin user...");
 
   // Use scrypt for password hashing (Better Auth default)
+  // Format: {saltHex}:{derivedKeyHex}
   const { scrypt } = await import("@noble/hashes/scrypt.js");
   const { randomBytes } = await import("node:crypto");
 
   const userId = generateId();
   const accountId = generateId();
-  const salt = randomBytes(16).toString("base64");
-  const passwordBuffer = Buffer.from(DEFAULT_ADMIN.password);
-  const hashedPassword = scrypt(passwordBuffer, Buffer.from(salt, "base64"), {
+
+  // Generate 16-byte salt and encode as hex
+  const saltBuffer = randomBytes(16);
+  const saltHex = saltBuffer.toString("hex");
+
+  // Normalize password with NFKC (Better Auth requirement)
+  const normalizedPassword = DEFAULT_ADMIN.password.normalize("NFKC");
+
+  // Derive key using scrypt with Better Auth's parameters
+  const derivedKey = scrypt(normalizedPassword, saltBuffer, {
     N: 16_384,
     r: 16,
     p: 1,
     dkLen: 64,
   });
-  const passwordHash = `$scrypt$ln=16,r=16,p=1$${salt}$${Buffer.from(hashedPassword).toString("base64")}`;
+
+  // Format as {saltHex}:{derivedKeyHex}
+  const passwordHash = `${saltHex}:${Buffer.from(derivedKey).toString("hex")}`;
 
   // Check if admin user already exists using raw SQL
   const { sql } = await import("drizzle-orm");
