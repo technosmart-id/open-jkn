@@ -517,22 +517,45 @@ export async function seedChangeRequests(count = 20) {
 export async function clearAllData() {
   console.log("Clearing all JKN data...");
 
-  // Import sql for raw queries
+  // Import sql for raw SQL queries
   const { sql } = await import("drizzle-orm");
 
-  // Use raw SQL to truncate all tables (faster and resets sequences)
-  await db.execute(sql`TRUNCATE TABLE "contribution_payment" CASCADE`);
-  await db.execute(sql`TRUNCATE TABLE "data_change_request" CASCADE`);
-  await db.execute(sql`TRUNCATE TABLE "registration_application" CASCADE`);
+  // Use DELETE FROM with proper ordering to respect foreign key constraints
+  // Child tables first, then parent tables
+  await db.execute(sql`DELETE FROM "contribution_payment"`);
+  await db.execute(sql`DELETE FROM "data_change_request"`);
+  await db.execute(sql`DELETE FROM "registration_application"`);
+  await db.execute(sql`DELETE FROM "participant_healthcare_facility"`);
+  await db.execute(sql`DELETE FROM "bank_information"`);
+  await db.execute(sql`DELETE FROM "family_member"`);
+  await db.execute(sql`DELETE FROM "employment_identity"`);
+  await db.execute(sql`DELETE FROM "participant"`);
+  await db.execute(sql`DELETE FROM "dental_facility"`);
+  await db.execute(sql`DELETE FROM "healthcare_facility"`);
+
+  // Reset sequences
   await db.execute(
-    sql`TRUNCATE TABLE "participant_healthcare_facility" CASCADE`
+    sql`ALTER SEQUENCE contribution_payment_id_seq RESTART WITH 1`
   );
-  await db.execute(sql`TRUNCATE TABLE "bank_information" CASCADE`);
-  await db.execute(sql`TRUNCATE TABLE "family_member" CASCADE`);
-  await db.execute(sql`TRUNCATE TABLE "employment_identity" CASCADE`);
-  await db.execute(sql`TRUNCATE TABLE "participant" CASCADE`);
-  await db.execute(sql`TRUNCATE TABLE "dental_facility" CASCADE`);
-  await db.execute(sql`TRUNCATE TABLE "healthcare_facility" CASCADE`);
+  await db.execute(
+    sql`ALTER SEQUENCE data_change_request_id_seq RESTART WITH 1`
+  );
+  await db.execute(
+    sql`ALTER SEQUENCE registration_application_id_seq RESTART WITH 1`
+  );
+  await db.execute(
+    sql`ALTER SEQUENCE participant_healthcare_facility_id_seq RESTART WITH 1`
+  );
+  await db.execute(sql`ALTER SEQUENCE bank_information_id_seq RESTART WITH 1`);
+  await db.execute(sql`ALTER SEQUENCE family_member_id_seq RESTART WITH 1`);
+  await db.execute(
+    sql`ALTER SEQUENCE employment_identity_id_seq RESTART WITH 1`
+  );
+  await db.execute(sql`ALTER SEQUENCE participant_id_seq RESTART WITH 1`);
+  await db.execute(sql`ALTER SEQUENCE dental_facility_id_seq RESTART WITH 1`);
+  await db.execute(
+    sql`ALTER SEQUENCE healthcare_facility_id_seq RESTART WITH 1`
+  );
 
   console.log("✓ Cleared all JKN data");
 }
