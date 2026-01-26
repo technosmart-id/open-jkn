@@ -517,16 +517,22 @@ export async function seedChangeRequests(count = 20) {
 export async function clearAllData() {
   console.log("Clearing all JKN data...");
 
-  await db.delete(contributionPayment);
-  await db.delete(dataChangeRequest);
-  await db.delete(registrationApplication);
-  await db.delete(participantHealthcareFacility);
-  await db.delete(bankInformation);
-  await db.delete(familyMember);
-  await db.delete(employmentIdentity);
-  await db.delete(participant);
-  await db.delete(dentalFacility);
-  await db.delete(healthcareFacility);
+  // Import sql for raw queries
+  const { sql } = await import("drizzle-orm");
+
+  // Use raw SQL to truncate all tables (faster and resets sequences)
+  await db.execute(sql`TRUNCATE TABLE "contribution_payment" CASCADE`);
+  await db.execute(sql`TRUNCATE TABLE "data_change_request" CASCADE`);
+  await db.execute(sql`TRUNCATE TABLE "registration_application" CASCADE`);
+  await db.execute(
+    sql`TRUNCATE TABLE "participant_healthcare_facility" CASCADE`
+  );
+  await db.execute(sql`TRUNCATE TABLE "bank_information" CASCADE`);
+  await db.execute(sql`TRUNCATE TABLE "family_member" CASCADE`);
+  await db.execute(sql`TRUNCATE TABLE "employment_identity" CASCADE`);
+  await db.execute(sql`TRUNCATE TABLE "participant" CASCADE`);
+  await db.execute(sql`TRUNCATE TABLE "dental_facility" CASCADE`);
+  await db.execute(sql`TRUNCATE TABLE "healthcare_facility" CASCADE`);
 
   console.log("✓ Cleared all JKN data");
 }
