@@ -68,6 +68,23 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
+      {/* Default credentials info card */}
+      <Card className="border-blue-500 bg-blue-50 dark:bg-blue-950">
+        <CardHeader className="pb-3 text-center">
+          <CardTitle className="font-medium text-blue-900 text-sm dark:text-blue-100">
+            Default Admin Credentials
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-center text-sm">
+          <p className="text-blue-800 dark:text-blue-200">
+            <strong>Email:</strong> admin@jkn.go.id
+          </p>
+          <p className="text-blue-800 dark:text-blue-200">
+            <strong>Password:</strong> admin123456
+          </p>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Open JKN</CardTitle>

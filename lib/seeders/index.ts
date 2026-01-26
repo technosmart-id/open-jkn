@@ -1,5 +1,7 @@
 import { faker } from "@faker-js/faker/locale/id_ID";
+import { generateId } from "better-auth";
 import { db } from "@/lib/db";
+import { account, session, user } from "@/lib/db/schema/auth";
 import {
   bankInformation,
   contributionPayment,
@@ -12,6 +14,13 @@ import {
   participantHealthcareFacility,
   registrationApplication,
 } from "@/lib/db/schema/jkn";
+
+// Default admin credentials
+export const DEFAULT_ADMIN = {
+  email: "admin@jkn.go.id",
+  password: "admin123456",
+  name: "Admin JKN",
+} as const;
 
 const SEGMENTS = [
   "PU_PNS_PUSAT",
@@ -514,6 +523,69 @@ export async function seedChangeRequests(count = 20) {
   return requests;
 }
 
+export async function seedAdminUser() {
+  console.log("Seeding default admin user...");
+
+  // Simple password encoding using Node crypto
+  const crypto = await import("node:crypto");
+  const hashedPassword = crypto
+    .createHash("sha256")
+    .update(DEFAULT_ADMIN.password)
+    .digest("hex");
+
+  const userId = generateId();
+  const accountId = generateId();
+
+  // Check if admin user already exists using raw SQL
+  const { sql } = await import("drizzle-orm");
+  const existingUsers = await db
+    .select({
+      id: user.id,
+      email: user.email,
+    })
+    .from(user)
+    .where(sql`${user.email} = ${DEFAULT_ADMIN.email}`)
+    .limit(1);
+
+  if (existingUsers.length > 0) {
+    console.log("  ⊗ Admin user already exists, skipping...");
+    return existingUsers[0];
+  }
+
+  // Create user and account
+  await db.insert(user).values({
+    id: userId,
+    email: DEFAULT_ADMIN.email,
+    name: DEFAULT_ADMIN.name,
+    emailVerified: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  await db.insert(account).values({
+    id: accountId,
+    userId,
+    accountId: userId,
+    providerId: "credential",
+    password: hashedPassword,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  console.log(`✓ Seeded admin user (${DEFAULT_ADMIN.email})`);
+
+  const created = await db
+    .select({
+      id: user.id,
+      email: user.email,
+    })
+    .from(user)
+    .where(sql`${user.email} = ${DEFAULT_ADMIN.email}`)
+    .limit(1);
+
+  return created[0];
+}
+
 export async function clearAllData() {
   console.log("Clearing all JKN data...");
 
@@ -534,6 +606,11 @@ export async function clearAllData() {
       }
     }
   }
+
+  // Delete auth data first (due to foreign key constraints)
+  await safeDelete(session, "session");
+  await safeDelete(account, "account");
+  await safeDelete(user, "user");
 
   // Use Drizzle delete with where(sql) to delete all rows
   // Delete in correct order: child tables first, then parent tables
@@ -559,6 +636,9 @@ export async function seedAll() {
 
   await clearAllData();
 
+  // Seed admin user first
+  await seedAdminUser();
+
   await seedHealthcareFacilities(20);
   await seedDentalFacilities(10);
   await seedParticipants(50);
@@ -567,4 +647,7 @@ export async function seedAll() {
   await seedChangeRequests(20);
 
   console.log("\n✨ Database seeding completed!");
+  console.log("\n📧 Default admin credentials:");
+  console.log(`   Email: ${DEFAULT_ADMIN.email}`);
+  console.log(`   Password: ${DEFAULT_ADMIN.password}`);
 }

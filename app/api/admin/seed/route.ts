@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   clearAllData,
+  seedAdminUser,
   seedAll,
   seedChangeRequests,
   seedDentalFacilities,
@@ -73,6 +74,13 @@ export async function POST(request: Request) {
         const changes = await seedChangeRequests(count || 20);
         result.message = `Seeded ${changes.length} change requests`;
         result.stats = { changes: changes.length };
+        break;
+      }
+
+      case "admin": {
+        await seedAdminUser();
+        result.message = "Admin user created successfully";
+        result.stats = { admin: 1 };
         break;
       }
 
