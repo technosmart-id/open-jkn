@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
-
 export function AuthBackground({ children }: { children: React.ReactNode }) {
-  const [randomSeed] = useState(() => Math.random().toString(36).substring(7));
+  // Generate new seed on every page load/refresh
+  const randomSeed = Math.random().toString(36).substring(7);
 
   return (
     <div

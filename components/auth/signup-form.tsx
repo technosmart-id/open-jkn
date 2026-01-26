@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,7 @@ export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string>();
 
@@ -64,6 +66,9 @@ export function SignupForm({
 
     if (response.error) {
       setError(response.error.message || "Failed to create account");
+    } else {
+      // Redirect to dashboard on successful signup
+      router.push("/dashboard");
     }
   };
 
