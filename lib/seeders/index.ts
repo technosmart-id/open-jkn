@@ -521,11 +521,9 @@ export async function clearAllData() {
   const { sql } = await import("drizzle-orm");
 
   // Helper function to safely delete from a table
-  async function safeDelete(
-    table: ReturnType<typeof pgTable>,
-    tableName: string
-  ) {
+  async function safeDelete(table: unknown, tableName: string) {
     try {
+      // @ts-expect-error - Drizzle delete expects specific table type
       await db.delete(table).where(sql`1=1`);
       console.log(`  ✓ Cleared ${tableName}`);
     } catch (error) {
