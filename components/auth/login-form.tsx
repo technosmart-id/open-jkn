@@ -179,8 +179,9 @@ export function LoginForm({
             </FieldGroup>
           </form>
 
-          <div className="mt-6 flex flex-col items-center gap-2">
+          <div className="mt-4 flex flex-col items-center gap-2">
             <Button
+              className="cursor-pointer text-xs"
               disabled={isPending}
               onClick={fillDemoCredentials}
               size="sm"
