@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useSession } from "@/lib/auth/client";
 
-// JKN Navigation Data
+// JKN Navigation Data - Flattened for simpler UX
 const navMain = [
   {
     title: "Dashboard",
@@ -34,50 +34,26 @@ const navMain = [
     title: "Peserta",
     url: "/peserta",
     icon: Users,
-    items: [
-      { title: "Daftar Peserta", url: "/peserta" },
-      { title: "Tambah Peserta", url: "/peserta/baru" },
-      { title: "Cari Peserta", url: "/peserta/cari" },
-    ],
   },
   {
     title: "Pendaftaran",
     url: "/pendaftaran",
     icon: ClipboardList,
-    items: [
-      { title: "Daftar Pendaftaran", url: "/pendaftaran" },
-      { title: "Pendaftaran Baru", url: "/pendaftaran/baru" },
-      { title: "Verifikasi", url: "/pendaftaran/verifikasi" },
-    ],
   },
   {
     title: "Perubahan Data",
     url: "/perubahan",
     icon: Settings,
-    items: [
-      { title: "Daftar Permohonan", url: "/perubahan" },
-      { title: "Buat Permohonan", url: "/perubahan/baru" },
-    ],
   },
   {
     title: "Faskes",
     url: "/faskes",
     icon: Hospital,
-    items: [
-      { title: "Faskes Utama", url: "/faskes" },
-      { title: "Faskes Gigi", url: "/faskes/gigi" },
-      { title: "Faskes Peserta", url: "/faskes/peserta" },
-    ],
   },
   {
     title: "Pembayaran",
     url: "/pembayaran",
     icon: CreditCard,
-    items: [
-      { title: "Daftar Pembayaran", url: "/pembayaran" },
-      { title: "Input Pembayaran", url: "/pembayaran/input" },
-      { title: "Laporan", url: "/pembayaran/laporan" },
-    ],
   },
   {
     title: "Bank & Rekening",
@@ -85,15 +61,9 @@ const navMain = [
     icon: Wallet,
   },
   {
-    title: "Pengaturan",
-    url: "/pengaturan",
+    title: "Database Seeders",
+    url: "/pengaturan/seeders",
     icon: Settings,
-    items: [
-      { title: "Database Seeders", url: "/pengaturan/seeders" },
-      { title: "Profil", url: "/settings/profile" },
-      { title: "Pengguna", url: "/settings/users" },
-      { title: "Sistem", url: "/settings/system" },
-    ],
   },
 ];
 
