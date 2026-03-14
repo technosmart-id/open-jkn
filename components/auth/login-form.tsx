@@ -79,7 +79,7 @@ export function LoginForm({
 
     try {
       // First, seed/update the admin user
-      const response = await fetch("/api/demo/seed-admin", {
+      const response = await fetch("/demo/seed-admin", {
         method: "POST",
       });
 
