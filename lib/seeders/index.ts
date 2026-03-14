@@ -616,7 +616,15 @@ export async function clearAllData() {
       await db.delete(table).where(sql`1=1`);
       console.log(`  ✓ Cleared ${tableName}`);
     } catch (error) {
-      if (error instanceof Error && error.message.includes("does not exist")) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      const causeErrMsg =
+        error instanceof Error && error.cause instanceof Error
+          ? error.cause.message
+          : "";
+      if (
+        errMsg.includes("does not exist") ||
+        causeErrMsg.includes("does not exist")
+      ) {
         console.log(`  ⊗ Table ${tableName} does not exist yet, skipping...`);
       } else {
         throw error;

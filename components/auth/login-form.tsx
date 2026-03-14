@@ -73,24 +73,13 @@ export function LoginForm({
     }
   };
 
-  const fillDemoCredentials = async () => {
-    setIsPending(true);
-    setError(undefined);
-
-    try {
-      await fetch("/api/demo/admin", { method: "POST" });
-    } catch {
-      // Ignore error, continue to fill credentials
-    }
-
+  const fillDemoCredentials = () => {
     if (emailRef.current) {
       emailRef.current.value = DEMO_CREDENTIALS.email;
     }
     if (passwordRef.current) {
       passwordRef.current.value = DEMO_CREDENTIALS.password;
     }
-
-    setIsPending(false);
   };
 
   return (
