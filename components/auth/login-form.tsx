@@ -73,15 +73,43 @@ export function LoginForm({
     }
   };
 
-  const fillDemoCredentials = () => {
-    if (emailRef.current) {
-      emailRef.current.value = DEMO_CREDENTIALS.email;
-      // Trigger change event for React to detect the value change
-      emailRef.current.dispatchEvent(new Event("input", { bubbles: true }));
-    }
-    if (passwordRef.current) {
-      passwordRef.current.value = DEMO_CREDENTIALS.password;
-      passwordRef.current.dispatchEvent(new Event("input", { bubbles: true }));
+  const fillDemoCredentials = async () => {
+    setIsPending(true);
+    setError(undefined);
+
+    try {
+      // First, seed/update the admin user
+      const response = await fetch("/api/demo/seed-admin", {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        console.error("Failed to seed admin:", data);
+        setError("Failed to prepare demo account. Please try again.");
+        setIsPending(false);
+        return;
+      }
+
+      const data = await response.json();
+      console.log(data.message);
+
+      // Now fill the credentials
+      if (emailRef.current) {
+        emailRef.current.value = DEMO_CREDENTIALS.email;
+        emailRef.current.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      if (passwordRef.current) {
+        passwordRef.current.value = DEMO_CREDENTIALS.password;
+        passwordRef.current.dispatchEvent(
+          new Event("input", { bubbles: true })
+        );
+      }
+    } catch (err) {
+      console.error("Demo seed error:", err);
+      setError("Failed to prepare demo account. Please try again.");
+    } finally {
+      setIsPending(false);
     }
   };
 
