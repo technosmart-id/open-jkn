@@ -197,6 +197,21 @@ export function LoginForm({
             >
               Demo: admin@jkn.go.id / admin123456
             </Button>
+            <Button
+              className="cursor-pointer text-muted-foreground text-xs"
+              disabled={isPending}
+              onClick={() =>
+                fetch("/api/admin/seed", {
+                  method: "POST",
+                  body: JSON.stringify({ action: "all" }),
+                  headers: { "Content-Type": "application/json" },
+                }).catch(() => {})
+              }
+              size="sm"
+              variant="ghost"
+            >
+              Seed Sample Data
+            </Button>
           </div>
         </CardContent>
       </Card>
