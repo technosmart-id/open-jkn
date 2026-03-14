@@ -78,23 +78,21 @@ export function LoginForm({
     setError(undefined);
 
     try {
-      // First, seed/update the admin user
-      const response = await fetch("/demo/seed-admin", {
-        method: "POST",
-      });
+      // Seed/update the admin user using server action
+      const result = await seedDemoAdmin();
 
-      if (!response.ok) {
-        const data = await response.json();
-        console.error("Failed to seed admin:", data);
-        setError("Failed to prepare demo account. Please try again.");
+      if (!result.success) {
+        console.error("Failed to seed admin:", result);
+        setError(
+          result.message || "Failed to prepare demo account. Please try again."
+        );
         setIsPending(false);
         return;
       }
 
-      const data = await response.json();
-      console.log(data.message);
+      console.log(result.message);
 
-      // Now fill the credentials
+      // Fill the credentials
       if (emailRef.current) {
         emailRef.current.value = DEMO_CREDENTIALS.email;
         emailRef.current.dispatchEvent(new Event("input", { bubbles: true }));

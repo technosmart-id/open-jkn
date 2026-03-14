@@ -1,6 +1,7 @@
+"use server";
+
 import { generateId } from "better-auth";
 import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { account, user } from "@/lib/db/schema/auth";
 
@@ -10,7 +11,7 @@ const DEMO_ADMIN = {
   name: "Admin JKN",
 } as const;
 
-export async function POST() {
+export async function seedDemoAdmin() {
   try {
     // Use scryptAsync for password hashing (Better Auth default)
     const { scryptAsync } = await import("@noble/hashes/scrypt.js");
@@ -64,11 +65,7 @@ export async function POST() {
         .set({ password: passwordHash, updatedAt: new Date() })
         .where(eq(account.userId, userId));
 
-      return NextResponse.json({
-        success: true,
-        message: "Admin user updated",
-        created: false,
-      });
+      return { success: true, message: "Admin user updated", created: false };
     }
 
     // Create new user
@@ -92,20 +89,13 @@ export async function POST() {
       updatedAt: new Date(),
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "Admin user created",
-      created: true,
-    });
+    return { success: true, message: "Admin user created", created: true };
   } catch (error) {
     console.error("Demo admin seed error:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to seed admin user",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return {
+      success: false,
+      error: "Failed to seed admin user",
+      message: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }
