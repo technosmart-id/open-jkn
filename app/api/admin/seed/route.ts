@@ -1,7 +1,6 @@
 import { readFileSync } from "fs";
 import { NextResponse } from "next/server";
 import { join } from "path";
-import { db } from "@/lib/db";
 import {
   clearAllData,
   seedAdminUser,
@@ -23,7 +22,9 @@ async function runMigrations() {
   for (const file of sqlFiles) {
     try {
       const sqlContent = readFileSync(join(process.cwd(), file), "utf-8");
-      await db.execute((raw) => raw(sqlContent));
+      // Use pool directly to execute raw SQL
+      const { pool } = await import("@/lib/db");
+      await pool.query(sqlContent);
       console.log(`✓ Executed ${file}`);
     } catch (error: unknown) {
       const errMsg = error instanceof Error ? error.message : String(error);
