@@ -32,6 +32,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [isPending, setIsPending] = useState(false);
+  const [isSeeding, setIsSeeding] = useState(false);
   const [error, setError] = useState<string>();
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -188,18 +189,31 @@ export function LoginForm({
             </Button>
             <Button
               className="cursor-pointer text-muted-foreground text-xs"
-              disabled={isPending}
-              onClick={() =>
-                fetch("/api/admin/seed", {
-                  method: "POST",
-                  body: JSON.stringify({ action: "all" }),
-                  headers: { "Content-Type": "application/json" },
-                }).catch(() => {})
-              }
+              disabled={isPending || isSeeding}
+              onClick={async () => {
+                setIsSeeding(true);
+                try {
+                  await fetch("/api/admin/seed", {
+                    method: "POST",
+                    body: JSON.stringify({ action: "all" }),
+                    headers: { "Content-Type": "application/json" },
+                  });
+                } catch {
+                } finally {
+                  setIsSeeding(false);
+                }
+              }}
               size="sm"
               variant="ghost"
             >
-              Seed Sample Data
+              {isSeeding ? (
+                <>
+                  <Spinner className="mr-2 h-3 w-3" />
+                  Seeding...
+                </>
+              ) : (
+                "Seed Sample Data"
+              )}
             </Button>
           </div>
         </CardContent>

@@ -1,4 +1,7 @@
+import { readFileSync } from "fs";
 import { NextResponse } from "next/server";
+import { join } from "path";
+import { db } from "@/lib/db";
 import {
   clearAllData,
   seedAdminUser,
@@ -11,15 +14,25 @@ import {
   seedRegistrations,
 } from "@/lib/seeders";
 
-async function pushSchema() {
-  const { push } = await import("drizzle-kit/api");
-  const config = await import("../../../drizzle.config");
-  try {
-    await push(config.default, { strict: false });
-    console.log("✓ Schema pushed successfully");
-  } catch (error) {
-    console.error("Schema push error:", error);
-    // Continue anyway - tables might already exist
+async function runMigrations() {
+  const sqlFiles = [
+    "lib/db/migrations/create_jkn_tables.sql",
+    "lib/db/migrations/0001_fix_jkn_tables.sql",
+  ];
+
+  for (const file of sqlFiles) {
+    try {
+      const sqlContent = readFileSync(join(process.cwd(), file), "utf-8");
+      await db.execute((raw) => raw(sqlContent));
+      console.log(`✓ Executed ${file}`);
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      if (errMsg.includes("already exists")) {
+        console.log(`⊗ ${file} - tables already exist`);
+      } else {
+        console.error(`Error executing ${file}:`, errMsg);
+      }
+    }
   }
 }
 
@@ -32,8 +45,7 @@ export async function POST(request: Request) {
 
     switch (action) {
       case "all":
-        // Push schema first
-        await pushSchema();
+        await runMigrations();
         await seedAll();
         result.message = "Database seeded successfully with all data";
         result.stats = {
@@ -47,7 +59,7 @@ export async function POST(request: Request) {
         break;
 
       case "facilities": {
-        await pushSchema();
+        await runMigrations();
         const facilities = await seedHealthcareFacilities(count || 20);
         result.message = `Seeded ${facilities.length} healthcare facilities`;
         result.stats = { facilities: facilities.length };
@@ -55,7 +67,7 @@ export async function POST(request: Request) {
       }
 
       case "dental": {
-        await pushSchema();
+        await runMigrations();
         const dental = await seedDentalFacilities(count || 10);
         result.message = `Seeded ${dental.length} dental facilities`;
         result.stats = { dental: dental.length };
@@ -63,7 +75,7 @@ export async function POST(request: Request) {
       }
 
       case "participants": {
-        await pushSchema();
+        await runMigrations();
         const participants = await seedParticipants(count || 50);
         result.message = `Seeded ${participants.length} participants`;
         result.stats = { participants: participants.length };
@@ -71,7 +83,7 @@ export async function POST(request: Request) {
       }
 
       case "registrations": {
-        await pushSchema();
+        await runMigrations();
         const registrations = await seedRegistrations(count || 30);
         result.message = `Seeded ${registrations.length} registrations`;
         result.stats = { registrations: registrations.length };
@@ -79,7 +91,7 @@ export async function POST(request: Request) {
       }
 
       case "payments": {
-        await pushSchema();
+        await runMigrations();
         const payments = await seedPayments(count || 100);
         result.message = `Seeded ${payments.length} payments`;
         result.stats = { payments: payments.length };
@@ -87,7 +99,7 @@ export async function POST(request: Request) {
       }
 
       case "changes": {
-        await pushSchema();
+        await runMigrations();
         const changes = await seedChangeRequests(count || 20);
         result.message = `Seeded ${changes.length} change requests`;
         result.stats = { changes: changes.length };
@@ -95,7 +107,7 @@ export async function POST(request: Request) {
       }
 
       case "admin": {
-        await pushSchema();
+        await runMigrations();
         await seedAdminUser();
         result.message = "Admin user created successfully";
         result.stats = { admin: 1 };
