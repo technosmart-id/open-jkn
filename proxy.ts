@@ -15,11 +15,7 @@ export function proxy(request: NextRequest) {
   );
 
   // API routes that should always be accessible
-  if (
-    pathname.startsWith("/api/auth") ||
-    pathname.startsWith("/api/demo") ||
-    pathname.startsWith("/api/admin")
-  ) {
+  if (pathname.startsWith("/api/auth") || pathname.startsWith("/api/admin")) {
     return NextResponse.next();
   }
 
