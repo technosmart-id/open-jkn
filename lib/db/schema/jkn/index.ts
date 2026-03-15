@@ -122,6 +122,10 @@ export const relationshipEnum = pgEnum("relationship", [
   "FAMILY_LAIN",
 ]);
 
+// PISA Code (Hubungan Keluarga BPJS)
+// 1: Peserta, 2: Istri, 3: Suami, 4: Anak
+export const pisaCodeEnum = pgEnum("pisa_code", ["1", "2", "3", "4", "5"]);
+
 export const changeTypeEnum = pgEnum("change_type", [
   "ALAMAT",
   "TEMPAT_KERJA",
@@ -155,8 +159,11 @@ export const participant = pgTable("participant", {
   // Personal identity
   familyCardNumber: varchar("familyCardNumber", { length: 16 }).notNull(),
   identityNumber: varchar("identityNumber", { length: 16 }).notNull(), // NIK/KITAS/KITAP
-  fullName: varchar("fullName", { length: 100 }).notNull(),
+  firstName: varchar("firstName", { length: 100 }).notNull(),
+  lastName: varchar("lastName", { length: 100 }),
   nameOnCard: varchar("nameOnCard", { length: 100 }), // Nama pada kartu (could be different)
+
+  pisaCode: pisaCodeEnum("pisaCode").notNull().default("1"), // Default to Peserta
 
   gender: genderEnum("gender").notNull(),
   bloodType: bloodTypeEnum("bloodType").default("UNKNOWN"),
@@ -232,8 +239,14 @@ export const participant = pgTable("participant", {
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 
+  // Policy lifecycle for openIMIS sync
+  effectiveDate: timestamp("effectiveDate"),
+  expiryDate: timestamp("expiryDate"),
+
   // Status
   isActive: boolean("isActive").notNull().default(true),
+  statusPeserta: varchar("statusPeserta", { length: 50 }).default("AKTIF"), // JKN status
+  statusBayar: varchar("statusBayar", { length: 50 }).default("LUNAS"), // Payment status
   deactivatedAt: timestamp("deactivatedAt"),
   deactivationReason: text("deactivationReason"),
 });
@@ -381,8 +394,10 @@ export const familyMember = pgTable("family_member", {
 
   // Personal identity
   identityNumber: text("identityNumber").notNull(),
-  fullName: text("fullName").notNull(),
+  firstName: text("firstName").notNull(),
+  lastName: text("lastName"),
   relationship: relationshipEnum("relationship").notNull(),
+  pisaCode: pisaCodeEnum("pisaCode").notNull(), // 2: Istri, 3: Suami, 4: Anak
 
   // Child ordering (for children: Anak Ke-I, II, III, etc.)
   childOrder: integer("childOrder"),
