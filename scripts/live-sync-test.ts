@@ -2,41 +2,38 @@ import * as dotenv from "dotenv";
 import { drizzle } from "drizzle-orm/node-postgres";
 import path from "path";
 import { Pool } from "pg";
-import { SyncService } from "../lib/sync";
+import { tblFamilies, tblInsuree, tblPolicy } from "../lib/db/schema/openimis";
 
 // Load env
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
 /**
  * Live Backend Sync Test
- * Bypasses local JKN DB (using mock) but connects to REAL openIMIS via tunnel
+ * Connects to REAL openIMIS database and syncs a test participant
  */
 async function liveSyncTest() {
   console.log("--- Starting Live Backend Sync Test ---");
 
-  // Initialize SyncService in REAL mode (dryRun: false)
-  // We override construction to use direct object params to avoid @ encoding issues
-  const syncService = new SyncService({ dryRun: false });
-
-  // Manually override the pool to use direct params
-  (syncService as any).pool = new Pool({
+  // Create direct connection to openIMIS
+  const pool = new Pool({
     host: "localhost",
     port: 5432,
     user: "IMISuser",
     password: "IMISuserP@s",
     database: "IMIS",
   });
-  (syncService as any).imisDb = drizzle((syncService as any).pool, {
-    schema: require("../lib/db/schema/openimis"),
+
+  const imisDb = drizzle(pool, {
+    schema: { tblInsuree, tblFamilies, tblPolicy },
   });
 
-  // Mock JKN Participant Data (Manually constructed to skip DB fetch)
+  // Mock JKN Participant Data
   const mockParticipant = {
-    id: 888, // Custom ID
+    id: 888,
     identityNumber: "3273012345670001",
     familyCardNumber: "3273012345678901",
-    firstName: "andrie",
-    lastName: "yunus",
+    firstName: "Andrie",
+    lastName: "Yunus",
     gender: "LAKI_LAKI",
     birthDate: new Date("1992-08-15"),
     maritalStatus: "BELUM_KAWIN",
@@ -54,125 +51,121 @@ async function liveSyncTest() {
   );
 
   try {
-    // We override the syncParticipant logic slightly or just mock the db.query part
-    // Since SyncService is a class, we'll patch it for this test to use our mock
+    const { openIMISMapping, DEFAULT_OPENIMIS_LOCATION_ID } = await import(
+      "../lib/db/schema/jkn/sync-utils"
+    );
+    const { eq } = await import("drizzle-orm");
 
-    // @ts-expect-error - Patching for test
-    syncService.syncParticipant = async function (participantId: number) {
-      const participant = mockParticipant;
-      console.log(`[Test] Using Mocked JKN Data for ID: ${participantId}`);
+    // Map data
+    const gender =
+      (openIMISMapping.gender as any)[mockParticipant.gender] ||
+      openIMISMapping.gender.default;
+    const maritalStatus =
+      (openIMISMapping.maritalStatus as any)[mockParticipant.maritalStatus] ||
+      openIMISMapping.maritalStatus.default;
 
-      // Re-implement the core sync logic here for the test
-      // (Copy-pasted from SyncService.syncParticipant but using our mock object)
-      // This is safer than trying to populate a potentially broken local DB
+    // Check/create family
+    let imisFamily = await imisDb.query.tblFamilies.findFirst({
+      where: eq(tblFamilies.confirmationNo, mockParticipant.familyCardNumber),
+    });
 
-      const {
-        openIMISMapping,
-        mapPolicyStatus,
-        DEFAULT_OPENIMIS_LOCATION_ID,
-      } = require("../lib/db/schema/jkn/sync-utils");
-      const { eq } = require("drizzle-orm");
-      const openimisSchema = require("../lib/db/schema/openimis");
+    if (imisFamily) {
+      console.log(`  Found existing FamilyID: ${imisFamily.FamilyID}`);
+    } else {
+      console.log(
+        `[Sync] Creating family: ${mockParticipant.familyCardNumber}`
+      );
+      const [newFamily] = await imisDb
+        .insert(tblFamilies)
+        .values({
+          confirmationNo: mockParticipant.familyCardNumber,
+          familyAddress: mockParticipant.addressStreet,
+          locationId: DEFAULT_OPENIMIS_LOCATION_ID,
+          validityFrom: new Date(),
+        })
+        .returning();
+      imisFamily = newFamily;
+      console.log(`  Created FamilyID: ${newFamily.FamilyID}`);
+    }
 
-      const firstName = participant.firstName;
-      const lastName = participant.lastName || "";
-      const gender =
-        (openIMISMapping.gender as any)[participant.gender] ||
-        openIMISMapping.gender.default;
-      const maritalStatus =
-        (openIMISMapping.maritalStatus as any)[participant.maritalStatus] ||
-        openIMISMapping.maritalStatus.default;
+    // Check/create insuree
+    const existingInsuree = await imisDb.query.tblInsuree.findFirst({
+      where: eq(tblInsuree.chfId, mockParticipant.bpjsNumber || ""),
+    });
 
-      let imisFamily = await this.imisDb.query.tblFamilies.findFirst({
-        where: eq(
-          openimisSchema.tblFamilies.familyCode,
-          participant.familyCardNumber
-        ),
-      });
-
-      if (!imisFamily) {
-        console.log(
-          `[Sync] Creating family record: ${participant.familyCardNumber}`
-        );
-        const [newFamily] = await this.imisDb
-          .insert(openimisSchema.tblFamilies)
-          .values({
-            familyCode: participant.familyCardNumber,
-            address: participant.addressStreet,
-            locationId: DEFAULT_OPENIMIS_LOCATION_ID,
-          })
-          .returning();
-        imisFamily = newFamily;
-      }
-
-      const existingInsuree = await this.imisDb.query.tblInsuree.findFirst({
-        where: eq(
-          openimisSchema.tblInsuree.chfId,
-          participant.bpjsNumber || ""
-        ),
-      });
-
-      const insureeData = {
-        chfId: participant.bpjsNumber || `JKN-${participant.identityNumber}`,
-        otherNames: firstName,
-        lastName,
-        gender,
-        dob: participant.birthDate,
-        maritalStatus,
-        address: participant.addressStreet,
-        phoneNumber: participant.phoneNumber,
-        email: participant.email,
-        familyId: imisFamily.id,
-        locationId: DEFAULT_OPENIMIS_LOCATION_ID,
-      };
-
-      if (existingInsuree) {
-        console.log(`[Sync] Updating insuree ${insureeData.chfId}`);
-        await this.imisDb
-          .update(openimisSchema.tblInsuree)
-          .set(insureeData)
-          .where(eq(openimisSchema.tblInsuree.id, existingInsuree.id));
-      } else {
-        console.log(`[Sync] Inserting new insuree ${insureeData.chfId}`);
-        await this.imisDb.insert(openimisSchema.tblInsuree).values(insureeData);
-      }
-
-      if (participant.statusPeserta === "AKTIF" && participant.bpjsNumber) {
-        const policyUUID = `POL-${participant.bpjsNumber}`;
-        const policyData = {
-          policyUUID,
-          familyId: imisFamily.id,
-          effectiveDate: participant.effectiveDate,
-          expiryDate: participant.expiryDate,
-          status: mapPolicyStatus(participant.statusPeserta),
-        };
-
-        const existingPolicy = await this.imisDb.query.tblPolicies.findFirst({
-          where: eq(openimisSchema.tblPolicies.policyUUID, policyUUID),
-        });
-
-        if (existingPolicy) {
-          console.log(`[Sync] Updating policy ${policyUUID}`);
-          await this.imisDb
-            .update(openimisSchema.tblPolicies)
-            .set(policyData)
-            .where(eq(openimisSchema.tblPolicies.id, existingPolicy.id));
-        } else {
-          console.log(`[Sync] Inserting policy ${policyUUID}`);
-          await this.imisDb
-            .insert(openimisSchema.tblPolicies)
-            .values(policyData);
-        }
-      }
+    const insureeData = {
+      chfId: mockParticipant.bpjsNumber,
+      otherNames: mockParticipant.firstName,
+      lastName: mockParticipant.lastName,
+      gender,
+      dob: mockParticipant.birthDate,
+      maritalStatus,
+      address: mockParticipant.addressStreet,
+      phoneNumber: mockParticipant.phoneNumber,
+      email: mockParticipant.email,
+      familyId: imisFamily.FamilyID,
+      locationId: DEFAULT_OPENIMIS_LOCATION_ID,
+      validityFrom: new Date(),
     };
 
-    await syncService.syncParticipant(mockParticipant.id);
-    console.log("--- Live Sync Test Success! ---");
+    if (existingInsuree) {
+      console.log(`[Sync] Updating insuree: ${insureeData.chfId}`);
+      await imisDb
+        .update(tblInsuree)
+        .set(insureeData)
+        .where(eq(tblInsuree.id, existingInsuree.id));
+    } else {
+      console.log(`[Sync] Inserting insuree: ${insureeData.chfId}`);
+      await imisDb.insert(tblInsuree).values(insureeData);
+    }
+
+    // Check/create policy
+    if (
+      mockParticipant.statusPeserta === "AKTIF" &&
+      mockParticipant.bpjsNumber
+    ) {
+      const { mapPolicyStatus } = await import(
+        "../lib/db/schema/jkn/sync-utils"
+      );
+      const policyUUID = `POL-${mockParticipant.bpjsNumber}`;
+      const policyData = {
+        policyUuid: policyUUID,
+        familyId: imisFamily.FamilyID,
+        effectiveDate: mockParticipant.effectiveDate,
+        expiryDate: mockParticipant.expiryDate,
+        status: mapPolicyStatus(mockParticipant.statusPeserta),
+        enrollDate: new Date(),
+        startDate: mockParticipant.effectiveDate || new Date(),
+      };
+
+      const existingPolicy = await imisDb.query.tblPolicy.findFirst({
+        where: eq(tblPolicy.policyUuid, policyUUID),
+      });
+
+      if (existingPolicy) {
+        console.log(`[Sync] Updating policy: ${policyUUID}`);
+        await imisDb
+          .update(tblPolicy)
+          .set(policyData)
+          .where(eq(tblPolicy.id, existingPolicy.id));
+      } else {
+        console.log(`[Sync] Inserting policy: ${policyUUID}`);
+        await imisDb.insert(tblPolicy).values(policyData);
+      }
+    }
+
+    console.log("\n--- Live Sync Test SUCCESS! ---");
+    console.log("Summary:");
+    console.log(`  FamilyID: ${imisFamily.FamilyID}`);
+    console.log(`  CHFID: ${mockParticipant.bpjsNumber}`);
+    console.log(
+      `  Name: ${mockParticipant.firstName} ${mockParticipant.lastName}`
+    );
   } catch (error) {
     console.error("--- Live Sync Test FAILED! ---");
     console.error(error);
   } finally {
-    await syncService.close();
+    await pool.end();
     process.exit(0);
   }
 }
