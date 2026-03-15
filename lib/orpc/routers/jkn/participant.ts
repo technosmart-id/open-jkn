@@ -59,7 +59,7 @@ export const participantRouter = {
 
       if (input.search) {
         conditions.push(
-          sql`${participant.fullName} ILIKE ${`%${input.search}%`} OR ${participant.bpjsNumber} ILIKE ${`%${input.search}%`} OR ${participant.identityNumber} ILIKE ${`%${input.search}%`}`
+          sql`CONCAT(${participant.firstName}, ' ', ${participant.lastName}) ILIKE ${`%${input.search}%`} OR ${participant.bpjsNumber} ILIKE ${`%${input.search}%`} OR ${participant.identityNumber} ILIKE ${`%${input.search}%`}`
         );
       }
 
@@ -336,11 +336,21 @@ export const participantRouter = {
         ...participantData
       } = input;
 
+      // Transform fullName to firstName/lastName for participant
+      const fullName = (participantData as any).fullName || "";
+      const nameParts = fullName.trim().split(" ");
+      const firstName = nameParts[0] || "";
+      const lastName = nameParts.slice(1).join(" ") || null;
+      const { fullName: _, ...participantDataWithoutFullName } =
+        participantData as any;
+
       // Insert participant
       const [newParticipant] = await db
         .insert(participant)
         .values({
-          ...participantData,
+          ...participantDataWithoutFullName,
+          firstName,
+          lastName,
           userId: context.user.id,
         })
         .returning();
@@ -376,8 +386,17 @@ export const participantRouter = {
       // Insert family members
       if (familyMembers && familyMembers.length > 0) {
         for (const member of familyMembers) {
+          // Transform fullName to firstName/lastName for family member
+          const memberFullName = (member as any).fullName || "";
+          const mNameParts = memberFullName.trim().split(" ");
+          const mFirstName = mNameParts[0] || "";
+          const mLastName = mNameParts.slice(1).join(" ") || null;
+          const { fullName: __, ...memberWithoutFullName } = member as any;
+
           await db.insert(familyMember).values({
-            ...member,
+            ...memberWithoutFullName,
+            firstName: mFirstName,
+            lastName: mLastName,
             birthDate: new Date(member.birthDate),
             studentVerificationDate: member.studentVerificationDate
               ? new Date(member.studentVerificationDate)
@@ -410,9 +429,19 @@ export const participantRouter = {
       })
     )
     .handler(async ({ input }) => {
+      const { fullName, ...restData } = input.data as any;
+
+      // Transform fullName to firstName/lastName if provided
+      const updateData: any = { ...restData, updatedAt: new Date() };
+      if (fullName) {
+        const nameParts = fullName.trim().split(" ");
+        updateData.firstName = nameParts[0] || "";
+        updateData.lastName = nameParts.slice(1).join(" ") || null;
+      }
+
       const [updated] = await db
         .update(participant)
-        .set({ ...input.data, updatedAt: new Date() })
+        .set(updateData)
         .where(eq(participant.id, input.id))
         .returning();
 

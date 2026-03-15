@@ -90,7 +90,8 @@ export default function BankListPage() {
               banks?.data.map((participant) => (
                 <TableRow key={participant.id}>
                   <TableCell className="font-medium">
-                    {participant.fullName}
+                    {participant.firstName}
+                    {participant.lastName && ` ${participant.lastName}`}
                   </TableCell>
                   <TableCell>{participant.bpjsNumber}</TableCell>
                   <TableCell>-</TableCell>

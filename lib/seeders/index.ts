@@ -150,11 +150,15 @@ function createFamilyMember(
 ): typeof familyMember.$inferInsert {
   const isChild = randomBoolean();
   const city = faker.location.city();
+  const fullName = faker.person.fullName();
+  const nameParts = fullName.split(" ");
   return {
     headOfFamilyId: participantIndex + 1,
-    fullName: faker.person.fullName(),
+    firstName: nameParts[0] || "",
+    lastName: nameParts.slice(1).join(" ") || null,
     identityNumber: faker.string.numeric(16),
     relationship: isChild ? "ANAK_TANGGUNGAN" : "ISTRI",
+    pisaCode: isChild ? "4" : "2", // 4: Anak, 2: Istri
     birthDate: faker.date.birthdate({ mode: "age", min: 1, max: 25 }),
     isStudent: isChild && randomBoolean(),
     gender: faker.person.sex() === "female" ? "PEREMPUAN" : "LAKI_LAKI",
@@ -216,12 +220,15 @@ function createParticipantData(
   const city = faker.location.city();
   const state = faker.location.state();
   const street = faker.location.streetAddress();
+  const fullName = faker.person.fullName();
+  const nameParts = fullName.split(" ");
 
   return {
     bpjsNumber: `${String(index + 1).padStart(13, "0")}`,
     familyCardNumber: faker.string.numeric(16),
     identityNumber: faker.string.numeric(16),
-    fullName: faker.person.fullName(),
+    firstName: nameParts[0] || "",
+    lastName: nameParts.slice(1).join(" ") || null,
     gender: faker.person.sex() === "female" ? "PEREMPUAN" : "LAKI_LAKI",
     bloodType: "O" as const,
     birthPlace: city,

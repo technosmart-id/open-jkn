@@ -234,7 +234,10 @@ export default function PaymentInputPage() {
                     onClick={() => setParticipantId(participant.id)}
                     type="button"
                   >
-                    <p className="font-medium">{participant.fullName}</p>
+                    <p className="font-medium">
+                      {participant.firstName}
+                      {participant.lastName && ` ${participant.lastName}`}
+                    </p>
                     <p className="text-muted-foreground text-sm">
                       {participant.bpjsNumber} •{" "}
                       {participant.participantSegment}

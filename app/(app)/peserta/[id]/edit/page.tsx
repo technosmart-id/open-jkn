@@ -43,7 +43,12 @@ export default function EditParticipantPage() {
   // Populate form when participant data loads
   useEffect(() => {
     if (participant) {
-      setFullName(participant.fullName ?? "");
+      const fullName = participant.firstName
+        ? participant.lastName
+          ? `${participant.firstName} ${participant.lastName}`
+          : participant.firstName
+        : "";
+      setFullName(fullName);
       setPhoneNumber(participant.phoneNumber ?? "");
       setEmail(participant.email ?? "");
       setAddressStreet(participant.addressStreet ?? "");

@@ -207,7 +207,10 @@ export default function ParticipantListPage() {
                     <TableCell className="font-medium">
                       {formatBpjsNumber(participant.bpjsNumber)}
                     </TableCell>
-                    <TableCell>{participant.fullName}</TableCell>
+                    <TableCell>
+                      {participant.firstName}
+                      {participant.lastName && ` ${participant.lastName}`}
+                    </TableCell>
                     <TableCell>{participant.identityNumber}</TableCell>
                     <TableCell>{participant.participantSegment}</TableCell>
                     <TableCell>Kelas {participant.treatmentClass}</TableCell>

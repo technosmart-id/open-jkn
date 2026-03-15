@@ -87,7 +87,10 @@ export default function ParticipantDetailPage() {
             </div>
             <div>
               <p className="text-muted-foreground text-sm">Nama Lengkap</p>
-              <p className="font-medium">{participant.fullName}</p>
+              <p className="font-medium">
+                {participant.firstName}
+                {participant.lastName && ` ${participant.lastName}`}
+              </p>
             </div>
             <div>
               <p className="text-muted-foreground text-sm">Nama di Kartu</p>

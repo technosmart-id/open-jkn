@@ -109,7 +109,11 @@ export default function NewChangeRequestPage() {
           newData.addressProvince = addressProvince;
           break;
         case "NAMA":
-          previousData.fullName = participant.fullName;
+          previousData.fullName = participant.firstName
+            ? participant.lastName
+              ? `${participant.firstName} ${participant.lastName}`
+              : participant.firstName
+            : "";
           newData.fullName = fullName;
           break;
         case "TEMPAT_KERJA":
@@ -283,7 +287,10 @@ export default function NewChangeRequestPage() {
                         onClick={() => setParticipantId(p.id)}
                         type="button"
                       >
-                        <p className="font-medium">{p.fullName}</p>
+                        <p className="font-medium">
+                          {p.firstName}
+                          {p.lastName && ` ${p.lastName}`}
+                        </p>
                         <p className="text-muted-foreground text-sm">
                           {p.bpjsNumber} • {p.participantSegment}
                         </p>
@@ -400,7 +407,11 @@ export default function NewChangeRequestPage() {
                       value={fullName}
                     />
                     <p className="mt-2 text-muted-foreground text-sm">
-                      Nama saat ini: <strong>{participant?.fullName}</strong>
+                      Nama saat ini:{" "}
+                      <strong>
+                        {participant?.firstName}
+                        {participant?.lastName && ` ${participant.lastName}`}
+                      </strong>
                     </p>
                   </div>
                 )}

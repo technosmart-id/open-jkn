@@ -293,7 +293,11 @@ export default function ChangeRequestDetailPage() {
             <CardContent className="grid gap-4 md:grid-cols-2">
               <div>
                 <p className="text-muted-foreground text-sm">Nama Lengkap</p>
-                <p className="font-medium">{request.participant.fullName}</p>
+                <p className="font-medium">
+                  {request.participant.firstName}
+                  {request.participant.lastName &&
+                    ` ${request.participant.lastName}`}
+                </p>
               </div>
               <div>
                 <p className="text-muted-foreground text-sm">Nomor BPJS</p>

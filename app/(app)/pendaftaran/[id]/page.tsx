@@ -325,7 +325,9 @@ export default function RegistrationDetailPage() {
               <div>
                 <p className="text-muted-foreground text-sm">Nama Lengkap</p>
                 <p className="font-medium">
-                  {registration.participant.fullName}
+                  {registration.participant.firstName}
+                  {registration.participant.lastName &&
+                    ` ${registration.participant.lastName}`}
                 </p>
               </div>
               <div>
