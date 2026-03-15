@@ -197,6 +197,7 @@ export const participantRouter = {
         fullName: z.string().min(3).max(100),
         nameOnCard: z.string().max(100).optional(),
         gender: z.enum(["LAKI_LAKI", "PEREMPUAN"]),
+        pisaCode: z.enum(["1", "2", "3", "4", "5"]).optional(),
         bloodType: z
           .enum([
             "A",
@@ -403,6 +404,7 @@ export const participantRouter = {
           addressCity: z.string().optional(),
           addressProvince: z.string().optional(),
           addressPostalCode: z.string().optional(),
+          pisaCode: z.enum(["1", "2", "3", "4", "5"]).optional(),
           photoUrl: z.string().optional(),
         }),
       })

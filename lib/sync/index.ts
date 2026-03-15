@@ -20,7 +20,7 @@ export class SyncService {
   private dryRun: boolean;
 
   constructor(options: { dryRun?: boolean } = {}) {
-    this.dryRun = options.dryRun;
+    this.dryRun = options.dryRun ?? true;
 
     if (this.dryRun) {
       console.log("[Sync] Initialized in DRY RUN mode");
