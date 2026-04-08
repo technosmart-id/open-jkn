@@ -124,7 +124,9 @@ export default function AnalitikPage() {
             <Button
               asChild
               className="w-full"
-              disabled={!isLoading && modelStatus && !modelStatus.canScore}
+              disabled={
+                !isLoading && modelStatus !== null && !modelStatus.canScore
+              }
             >
               <Link href="/analitik/anomali">
                 <Upload className="mr-2 h-4 w-4" />
@@ -183,7 +185,9 @@ export default function AnalitikPage() {
             <Button
               asChild
               className="w-full"
-              disabled={!isLoading && modelStatus && !modelStatus.hasOutput}
+              disabled={
+                !isLoading && modelStatus !== null && !modelStatus.hasOutput
+              }
               variant="outline"
             >
               <Link href="/analitik/dashboard">
