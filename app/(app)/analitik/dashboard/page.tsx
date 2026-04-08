@@ -263,7 +263,7 @@ export default function DashboardPage() {
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-red-500" />
-                <span>AKTIF_UMUR_&gt;110 - Peserta aktif >110 tahun</span>
+                <span>AKTIF_UMUR_>110 - Peserta aktif &gt;110 tahun</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-orange-500" />
@@ -271,15 +271,15 @@ export default function DashboardPage() {
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-orange-500" />
-                <span>ANAK_TAPI_UMUR_&gt;25 - Anak dengan usia >25 tahun</span>
+                <span>ANAK_TAPI_UMUR_>25 - Anak dengan usia &gt;25 tahun</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-yellow-500" />
-                <span>KAWIN_UMUR_&lt;16 - Menikah di usia <16 tahun</span>
+                <span>KAWIN_UMUR_<16 - Menikah di usia &lt;16 tahun</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-yellow-500" />
-                <span>KELUARGA_BESAR - Anggota keluarga >10 orang</span>
+                <span>KELUARGA_BESAR - Anggota keluarga &gt;10 orang</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-blue-500" />
