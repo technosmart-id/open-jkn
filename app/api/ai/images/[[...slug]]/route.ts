@@ -14,10 +14,11 @@ const FILE_MAP: Record<string, string> = {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string[] } }
+  { params }: { params: Promise<{ slug?: string[] }> }
 ) {
-  const slug = params.slug?.join("/") || "";
-  const fileName = FILE_MAP[slug] || slug;
+  const { slug } = await params;
+  const slugPath = slug?.join("/") || "";
+  const fileName = FILE_MAP[slugPath] || slugPath;
   const filePath = path.join(OUTPUT_DIR, fileName);
 
   // Check if file exists
