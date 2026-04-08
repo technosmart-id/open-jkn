@@ -4,6 +4,7 @@ import {
   AlertCircle,
   AlertTriangle,
   CheckCircle2,
+  Database,
   Download,
   FileSpreadsheet,
   Info,
@@ -26,8 +27,36 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+interface AnalysisResult {
+  id_peserta: string;
+  id_keluarga: string;
+  umur: number;
+  jml_keluarga?: number;
+  rasio_aktif?: number;
+  hybrid_score: number;
+  anomaly_source: "model_only" | "rule_only" | "model+rule" | "normal";
+  reason?: string;
+  top_ae_features?: string;
+}
+
+interface AnalysisSummary {
+  totalRecords: number;
+  anomaliesCount: number;
+  anomalyRate: number;
+  ruleBased: number;
+  modelBased: number;
+}
+
+interface AnalysisResponse {
+  success: boolean;
+  source?: string;
+  summary: AnalysisSummary;
+  scoredData: AnalysisResult[] | null;
+  anomalies: AnalysisResult[] | null;
+}
+
 // Mock data for demonstration
-const mockAnomalies = [
+const mockAnomalies: AnalysisResult[] = [
   {
     id_peserta: "12345678",
     id_keluarga: "K001",
@@ -83,22 +112,30 @@ const mockAnomalies = [
 export default function AnomaliPage() {
   const [file, setFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isAnalyzingDatabase, setIsAnalyzingDatabase] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [analysisResults, setAnalysisResults] = useState<{
+    summary: AnalysisSummary | null;
+    anomalies: AnalysisResult[];
+  }>({ summary: null, anomalies: [] });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
       setAnalysisComplete(false);
+      setError(null);
     }
   };
 
-  const handleAnalyze = async () => {
+  const handleAnalyzeFile = async () => {
     if (!file) return;
 
     setIsAnalyzing(true);
     setProgress(0);
+    setError(null);
 
     // Simulate progress
     const interval = setInterval(() => {
@@ -111,23 +148,126 @@ export default function AnomaliPage() {
       });
     }, 300);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/ai/anomaly", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.details || "Failed to analyze file");
+      }
+
+      const data = (await response.json()) as AnalysisResponse;
+
       clearInterval(interval);
       setProgress(100);
-      setIsAnalyzing(false);
+
+      setAnalysisResults({
+        summary: data.summary,
+        anomalies: (data.anomalies as AnalysisResult[]) || [],
+      });
       setAnalysisComplete(true);
-    }, 3500);
+    } catch (err) {
+      clearInterval(interval);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Terjadi kesalahan saat menganalisis data."
+      );
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
-  const anomalyCount = mockAnomalies.length;
-  const ruleBasedCount = mockAnomalies.filter(
-    (a) => a.anomaly_source === "rule_only" || a.anomaly_source === "model+rule"
-  ).length;
-  const modelBasedCount = mockAnomalies.filter(
-    (a) =>
-      a.anomaly_source === "model_only" || a.anomaly_source === "model+rule"
-  ).length;
+  const handleAnalyzeDatabase = async () => {
+    setIsAnalyzingDatabase(true);
+    setProgress(0);
+    setAnalysisComplete(false);
+    setError(null);
+
+    // Simulate progress
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 95) {
+          clearInterval(interval);
+          return 95;
+        }
+        return prev + 10;
+      });
+    }, 300);
+
+    try {
+      const response = await fetch("/api/ai/analyze-database", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          isActive: true,
+          limit: 50_000,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.details || "Failed to analyze database");
+      }
+
+      const data = (await response.json()) as AnalysisResponse;
+
+      clearInterval(interval);
+      setProgress(100);
+
+      setAnalysisResults({
+        summary: data.summary,
+        anomalies: (data.anomalies as AnalysisResult[]) || [],
+      });
+      setAnalysisComplete(true);
+    } catch (err) {
+      clearInterval(interval);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Terjadi kesalahan saat menganalisis database."
+      );
+    } finally {
+      setIsAnalyzingDatabase(false);
+    }
+  };
+
+  const handleReset = () => {
+    setFile(null);
+    setAnalysisComplete(false);
+    setProgress(0);
+    setError(null);
+    setAnalysisResults({ summary: null, anomalies: [] });
+  };
+
+  // Use analysis results if available, otherwise use mock data
+  const summary = analysisResults.summary;
+  const anomalies =
+    analysisResults.anomalies.length > 0
+      ? analysisResults.anomalies
+      : mockAnomalies;
+  const anomalyCount = anomalies.length;
+  const ruleBasedCount =
+    summary?.ruleBased ||
+    anomalies.filter(
+      (a) =>
+        a.anomaly_source === "rule_only" || a.anomaly_source === "model+rule"
+    ).length;
+  const modelBasedCount =
+    summary?.modelBased ||
+    anomalies.filter(
+      (a) =>
+        a.anomaly_source === "model_only" || a.anomaly_source === "model+rule"
+    ).length;
+  const totalData = summary?.totalRecords || 15_234;
 
   const getReasonBadges = (reason: string) =>
     reason.split("; ").map((r) => (
@@ -140,45 +280,51 @@ export default function AnomaliPage() {
       </Badge>
     ));
 
+  const isProcessing = isAnalyzing || isAnalyzingDatabase;
+
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
       <div>
         <h1 className="font-bold text-2xl">Deteksi Anomali Kepesertaan</h1>
         <p className="text-muted-foreground">
-          Upload data kepesertaan BPJS untuk mendeteksi pola anomali
+          Analisis data kepesertaan BPJS untuk mendeteksi pola anomali
         </p>
       </div>
 
-      {/* Upload Section */}
+      {/* Analysis Options */}
       <Card>
         <CardHeader>
-          <CardTitle>Upload Data</CardTitle>
+          <CardTitle>Pilih Sumber Data</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-start gap-4 sm:flex-row">
-            <div className="w-full flex-1">
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* File Upload Option */}
+            <div className="flex flex-col gap-3 rounded-lg border p-4">
+              <div className="flex items-center gap-2">
+                <Upload className="h-5 w-5 text-muted-foreground" />
+                <h3 className="font-semibold">Upload File</h3>
+              </div>
+              <p className="text-muted-foreground text-sm">
+                Upload file CSV atau DTA untuk analisis data kepesertaan.
+              </p>
               <label
-                className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/50 transition-colors hover:bg-muted"
+                className="flex h-24 w-full cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed bg-muted/50 transition-colors hover:bg-muted"
                 htmlFor="file-upload"
               >
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                <div className="flex flex-col items-center justify-center">
                   {file ? (
                     <>
-                      <FileSpreadsheet className="mb-2 h-8 w-8 text-green-600" />
-                      <p className="font-medium text-sm">{file.name}</p>
+                      <FileSpreadsheet className="mb-1 h-6 w-6 text-green-600" />
+                      <p className="font-medium text-xs">{file.name}</p>
                       <p className="text-muted-foreground text-xs">
                         {(file.size / 1024).toFixed(1)} KB
                       </p>
                     </>
                   ) : (
                     <>
-                      <Upload className="mb-2 h-8 w-8 text-muted-foreground" />
-                      <p className="text-muted-foreground text-sm">
-                        <span className="font-semibold">Klik untuk upload</span>{" "}
-                        atau drag and drop
-                      </p>
+                      <Upload className="mb-1 h-6 w-6 text-muted-foreground" />
                       <p className="text-muted-foreground text-xs">
-                        CSV atau DTA (MAX 100MB)
+                        Klik untuk upload CSV/DTA
                       </p>
                     </>
                   )}
@@ -186,18 +332,17 @@ export default function AnomaliPage() {
                 <input
                   accept=".csv,.dta"
                   className="hidden"
-                  disabled={isAnalyzing}
+                  disabled={isProcessing}
                   id="file-upload"
                   onChange={handleFileChange}
                   type="file"
                 />
               </label>
-            </div>
-            <div className="flex w-full flex-col gap-2 sm:w-auto">
               <Button
-                className="w-full sm:w-auto"
-                disabled={!file || isAnalyzing}
-                onClick={handleAnalyze}
+                className="w-full"
+                disabled={!file || isProcessing}
+                onClick={handleAnalyzeFile}
+                variant={file ? "default" : "outline"}
               >
                 {isAnalyzing ? (
                   <>
@@ -207,35 +352,69 @@ export default function AnomaliPage() {
                 ) : (
                   <>
                     <AlertTriangle className="mr-2 h-4 w-4" />
-                    Analisis Data
+                    Analisis File
                   </>
                 )}
               </Button>
-              {file && (
-                <Button
-                  className="w-full sm:w-auto"
-                  disabled={isAnalyzing}
-                  onClick={() => {
-                    setFile(null);
-                    setAnalysisComplete(false);
-                    setProgress(0);
-                  }}
-                  variant="outline"
-                >
-                  Reset
-                </Button>
-              )}
+            </div>
+
+            {/* Database Option */}
+            <div className="flex flex-col gap-3 rounded-lg border p-4">
+              <div className="flex items-center gap-2">
+                <Database className="h-5 w-5 text-muted-foreground" />
+                <h3 className="font-semibold">Database OpenJKN</h3>
+              </div>
+              <p className="text-muted-foreground text-sm">
+                Analisis langsung data kepesertaan yang tersimpan di database
+                OpenJKN.
+              </p>
+              <div className="flex h-24 w-full items-center justify-center rounded-md border-2 border-dashed bg-muted/50">
+                <div className="text-center">
+                  <Database className="mx-auto mb-1 h-8 w-8 text-blue-600" />
+                  <p className="text-muted-foreground text-xs">
+                    Data Peserta &amp; Keluarga
+                  </p>
+                </div>
+              </div>
+              <Button
+                className="w-full"
+                disabled={isProcessing}
+                onClick={handleAnalyzeDatabase}
+                variant="default"
+              >
+                {isAnalyzingDatabase ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Menganalisis...
+                  </>
+                ) : (
+                  <>
+                    <Database className="mr-2 h-4 w-4" />
+                    Analisis Database
+                  </>
+                )}
+              </Button>
             </div>
           </div>
 
-          {isAnalyzing && (
+          {isProcessing && (
             <div className="mt-4">
               <div className="mb-2 flex justify-between text-sm">
-                <span>Memproses data...</span>
+                <span>
+                  {isAnalyzing ? "Memproses file..." : "Mengquery database..."}
+                </span>
                 <span>{progress}%</span>
               </div>
               <Progress value={progress} />
             </div>
+          )}
+
+          {error && (
+            <Alert className="mt-4" variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Analisis Gagal</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
         </CardContent>
       </Card>
@@ -264,7 +443,9 @@ export default function AnomaliPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="font-bold text-2xl">15,234</div>
+                <div className="font-bold text-2xl">
+                  {totalData.toLocaleString()}
+                </div>
                 <p className="mt-1 text-muted-foreground text-xs">
                   Data diproses
                 </p>
@@ -282,7 +463,9 @@ export default function AnomaliPage() {
                   {anomalyCount}
                 </div>
                 <p className="mt-1 text-muted-foreground text-xs">
-                  {((anomalyCount / 15_234) * 100).toFixed(2)}% dari total
+                  {summary?.anomalyRate
+                    ? `${summary.anomalyRate.toFixed(2)}% dari total`
+                    : `${((anomalyCount / totalData) * 100).toFixed(2)}% dari total`}
                 </p>
               </CardContent>
             </Card>
@@ -327,7 +510,7 @@ export default function AnomaliPage() {
                 <div>
                   <CardTitle>Detail Anomali</CardTitle>
                 </div>
-                <Button size="sm" variant="outline">
+                <Button onClick={handleReset} size="sm" variant="outline">
                   <Download className="mr-2 h-4 w-4" />
                   Export CSV
                 </Button>
@@ -340,27 +523,24 @@ export default function AnomaliPage() {
                   <TabsTrigger value="rule">
                     Aturan (
                     {
-                      mockAnomalies.filter(
-                        (a) => a.anomaly_source === "rule_only"
-                      ).length
+                      anomalies.filter((a) => a.anomaly_source === "rule_only")
+                        .length
                     }
                     )
                   </TabsTrigger>
                   <TabsTrigger value="model">
                     ML Model (
                     {
-                      mockAnomalies.filter(
-                        (a) => a.anomaly_source === "model_only"
-                      ).length
+                      anomalies.filter((a) => a.anomaly_source === "model_only")
+                        .length
                     }
                     )
                   </TabsTrigger>
                   <TabsTrigger value="hybrid">
                     Keduanya (
                     {
-                      mockAnomalies.filter(
-                        (a) => a.anomaly_source === "model+rule"
-                      ).length
+                      anomalies.filter((a) => a.anomaly_source === "model+rule")
+                        .length
                     }
                     )
                   </TabsTrigger>
@@ -380,7 +560,7 @@ export default function AnomaliPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {mockAnomalies.map((anomaly) => (
+                        {anomalies.map((anomaly) => (
                           <TableRow key={anomaly.id_peserta}>
                             <TableCell className="font-medium">
                               {anomaly.id_peserta}
@@ -437,7 +617,9 @@ export default function AnomaliPage() {
                             </TableCell>
                             <TableCell>
                               <div className="flex flex-wrap">
-                                {getReasonBadges(anomaly.reason)}
+                                {anomaly.reason
+                                  ? getReasonBadges(anomaly.reason)
+                                  : "-"}
                               </div>
                             </TableCell>
                           </TableRow>
@@ -459,7 +641,7 @@ export default function AnomaliPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {mockAnomalies
+                        {anomalies
                           .filter((a) => a.anomaly_source === "rule_only")
                           .map((anomaly) => (
                             <TableRow key={anomaly.id_peserta}>
@@ -470,7 +652,9 @@ export default function AnomaliPage() {
                               <TableCell>{anomaly.umur} th</TableCell>
                               <TableCell>
                                 <div className="flex flex-wrap">
-                                  {getReasonBadges(anomaly.reason)}
+                                  {anomaly.reason
+                                    ? getReasonBadges(anomaly.reason)
+                                    : "-"}
                                 </div>
                               </TableCell>
                             </TableRow>
@@ -492,7 +676,7 @@ export default function AnomaliPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {mockAnomalies
+                        {anomalies
                           .filter((a) => a.anomaly_source === "model_only")
                           .map((anomaly) => (
                             <TableRow key={anomaly.id_peserta}>
@@ -506,8 +690,8 @@ export default function AnomaliPage() {
                                 </Badge>
                               </TableCell>
                               <TableCell className="text-muted-foreground text-sm">
-                                umur(0.234), jml_keluarga(0.189),
-                                rasio_aktif(0.145)
+                                {anomaly.top_ae_features ||
+                                  "umur, jml_keluarga"}
                               </TableCell>
                             </TableRow>
                           ))}
@@ -529,7 +713,7 @@ export default function AnomaliPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {mockAnomalies
+                        {anomalies
                           .filter((a) => a.anomaly_source === "model+rule")
                           .map((anomaly) => (
                             <TableRow key={anomaly.id_peserta}>
@@ -545,7 +729,9 @@ export default function AnomaliPage() {
                               </TableCell>
                               <TableCell>
                                 <div className="flex flex-wrap">
-                                  {getReasonBadges(anomaly.reason)}
+                                  {anomaly.reason
+                                    ? getReasonBadges(anomaly.reason)
+                                    : "-"}
                                 </div>
                               </TableCell>
                             </TableRow>
@@ -561,7 +747,7 @@ export default function AnomaliPage() {
       )}
 
       {/* Empty State */}
-      {!(analysisComplete || file) && (
+      {!(analysisComplete || file || isAnalyzingDatabase) && (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <AlertTriangle className="mb-4 h-12 w-12 text-muted-foreground" />
@@ -569,8 +755,8 @@ export default function AnomaliPage() {
               Belum ada data dianalisis
             </h3>
             <p className="max-w-md text-center text-muted-foreground text-sm">
-              Upload file data kepesertaan untuk memulai analisis deteksi
-              anomali. Sistem akan otomatis mendeteksi pola yang mencurigakan.
+              Pilih sumber data untuk memulai analisis deteksi anomali. Upload
+              file CSV/DTA atau analisis langsung dari database OpenJKN.
             </p>
           </CardContent>
         </Card>

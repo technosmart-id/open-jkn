@@ -1,5 +1,6 @@
 "use client";
 
+import { AlertCircle, CheckCircle2, Database, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -27,12 +28,38 @@ const DEMO_CREDENTIALS = {
   password: "admin123456",
 } as const;
 
+type SeedStatus =
+  | "idle"
+  | "migrations"
+  | "admin"
+  | "facilities"
+  | "dental"
+  | "participants"
+  | "registrations"
+  | "payments"
+  | "changes"
+  | "complete"
+  | "error";
+
+const SEED_STEPS: Array<{ key: SeedStatus; label: string }> = [
+  { key: "migrations", label: "Running migrations..." },
+  { key: "admin", label: "Creating admin user..." },
+  { key: "facilities", label: "Seeding healthcare facilities..." },
+  { key: "dental", label: "Seeding dental facilities..." },
+  { key: "participants", label: "Seeding participants..." },
+  { key: "registrations", label: "Seeding registrations..." },
+  { key: "payments", label: "Seeding payments..." },
+  { key: "changes", label: "Seeding change requests..." },
+];
+
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const [isPending, setIsPending] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
+  const [seedStatus, setSeedStatus] = useState<SeedStatus>("idle");
+  const [seedError, setSeedError] = useState<string | null>(null);
   const [error, setError] = useState<string>();
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -83,6 +110,53 @@ export function LoginForm({
     }
   };
 
+  const handleSeedDatabase = async () => {
+    setIsSeeding(true);
+    setSeedError(null);
+    setSeedStatus("migrations");
+
+    try {
+      // Simulate progress by polling or streaming
+      const response = await fetch("/api/admin/seed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "all" }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Seeding failed");
+      }
+
+      // For now, show each step with a delay to simulate progress
+      // In a real implementation, this could use Server-Sent Events for real-time updates
+      for (const step of SEED_STEPS) {
+        setSeedStatus(step.key);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+
+      setSeedStatus("complete");
+
+      // Auto-fill demo credentials after successful seeding
+      setTimeout(() => {
+        fillDemoCredentials();
+        setIsSeeding(false);
+        setSeedStatus("idle");
+      }, 1000);
+    } catch (err) {
+      setSeedStatus("error");
+      setSeedError(
+        err instanceof Error ? err.message : "Failed to seed database"
+      );
+      setIsSeeding(false);
+    }
+  };
+
+  const getCurrentStepLabel = () => {
+    const step = SEED_STEPS.find((s) => s.key === seedStatus);
+    return step?.label || "";
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -96,7 +170,7 @@ export function LoginForm({
               {/* Intentionally hidden for future use */}
               <Field className="hidden">
                 <Button
-                  disabled={isPending}
+                  disabled={isPending || isSeeding}
                   onClick={() => handleSocialSignIn("google")}
                   type="button"
                   variant="outline"
@@ -128,7 +202,7 @@ export function LoginForm({
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
-                  disabled={isPending}
+                  disabled={isPending || isSeeding}
                   id="email"
                   name="email"
                   placeholder="admin@jkn.local"
@@ -148,7 +222,7 @@ export function LoginForm({
                   </Link>
                 </div>
                 <Input
-                  disabled={isPending}
+                  disabled={isPending || isSeeding}
                   id="password"
                   name="password"
                   ref={passwordRef}
@@ -157,7 +231,11 @@ export function LoginForm({
                 />
               </Field>
               <Field>
-                <Button className="w-full" disabled={isPending} type="submit">
+                <Button
+                  className="w-full"
+                  disabled={isPending || isSeeding}
+                  type="submit"
+                >
                   {isPending ? (
                     <>
                       <Spinner className="mr-2 h-4 w-4" />
@@ -177,43 +255,78 @@ export function LoginForm({
             </FieldGroup>
           </form>
 
-          <div className="mt-4 flex flex-col items-center gap-2">
+          {/* Seed Database Section */}
+          <div className="mt-6 rounded-lg border bg-muted/50 p-4">
+            <div className="mb-3 flex items-center gap-2">
+              <Database className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium text-sm">Database Setup</span>
+            </div>
+
+            {seedStatus === "complete" ? (
+              <div className="flex items-center gap-2 text-green-600 text-sm dark:text-green-400">
+                <CheckCircle2 className="h-4 w-4" />
+                <span>Database seeded successfully!</span>
+              </div>
+            ) : seedStatus === "error" ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-destructive text-sm">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>{seedError || "Seeding failed"}</span>
+                </div>
+                <Button
+                  className="h-8 text-xs"
+                  onClick={handleSeedDatabase}
+                  size="sm"
+                  variant="outline"
+                >
+                  Retry
+                </Button>
+              </div>
+            ) : isSeeding ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>{getCurrentStepLabel()}</span>
+                </div>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-primary/20">
+                  <div
+                    className="h-full animate-pulse bg-primary transition-all duration-300"
+                    style={{
+                      width: `${((SEED_STEPS.findIndex((s) => s.key === seedStatus) + 1) / SEED_STEPS.length) * 100}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-muted-foreground text-xs">
+                  Seed sample data for development and testing. This will create
+                  facilities, participants, registrations, and payments.
+                </p>
+                <Button
+                  className="h-8 w-full text-xs"
+                  disabled={isPending}
+                  onClick={handleSeedDatabase}
+                  size="sm"
+                  variant="outline"
+                >
+                  <Database className="mr-2 h-3 w-3" />
+                  Seed Sample Data
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Demo Credentials */}
+          <div className="flex flex-col items-center gap-2">
             <Button
               className="cursor-pointer text-xs"
-              disabled={isPending}
+              disabled={isPending || isSeeding}
               onClick={fillDemoCredentials}
               size="sm"
               variant="ghost"
             >
               Demo: admin@jkn.go.id / admin123456
-            </Button>
-            <Button
-              className="cursor-pointer text-muted-foreground text-xs"
-              disabled={isPending || isSeeding}
-              onClick={async () => {
-                setIsSeeding(true);
-                try {
-                  await fetch("/api/admin/seed", {
-                    method: "POST",
-                    body: JSON.stringify({ action: "all" }),
-                    headers: { "Content-Type": "application/json" },
-                  });
-                } catch {
-                } finally {
-                  setIsSeeding(false);
-                }
-              }}
-              size="sm"
-              variant="ghost"
-            >
-              {isSeeding ? (
-                <>
-                  <Spinner className="mr-2 h-3 w-3" />
-                  Seeding...
-                </>
-              ) : (
-                "Seed Sample Data"
-              )}
             </Button>
           </div>
         </CardContent>

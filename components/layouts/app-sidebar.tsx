@@ -6,7 +6,6 @@ import {
   CreditCard,
   Home,
   Hospital,
-  Settings,
   Users,
   Wallet,
 } from "lucide-react";
@@ -44,7 +43,7 @@ const navMain = [
   {
     title: "Perubahan Data",
     url: "/perubahan",
-    icon: Settings,
+    icon: Hospital,
   },
   {
     title: "Faskes",
@@ -65,11 +64,6 @@ const navMain = [
     title: "Analitik & AI",
     url: "/analitik",
     icon: Brain,
-  },
-  {
-    title: "Database Seeders",
-    url: "/pengaturan/seeders",
-    icon: Settings,
   },
 ];
 
