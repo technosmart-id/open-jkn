@@ -269,16 +269,18 @@ export default function AnomaliPage() {
     ).length;
   const totalData = summary?.totalRecords || 15_234;
 
-  const getReasonBadges = (reason: string) =>
-    reason.split("; ").map((r) => (
+  const getReasonBadges = (reason: string | undefined | null) => {
+    if (!reason) return null;
+    return reason.split("; ").map((r, idx) => (
       <Badge
         className="mr-1 mb-1 whitespace-nowrap text-xs"
-        key={r}
+        key={`${r}-${idx}`}
         variant="outline"
       >
         {r.replace(/_/g, " ")}
       </Badge>
     ));
+  };
 
   const isProcessing = isAnalyzing || isAnalyzingDatabase;
 
@@ -617,9 +619,11 @@ export default function AnomaliPage() {
                             </TableCell>
                             <TableCell>
                               <div className="flex flex-wrap">
-                                {anomaly.reason
-                                  ? getReasonBadges(anomaly.reason)
-                                  : "-"}
+                                {getReasonBadges(anomaly.reason) || (
+                                  <span className="text-muted-foreground text-xs">
+                                    -
+                                  </span>
+                                )}
                               </div>
                             </TableCell>
                           </TableRow>
@@ -652,9 +656,11 @@ export default function AnomaliPage() {
                               <TableCell>{anomaly.umur} th</TableCell>
                               <TableCell>
                                 <div className="flex flex-wrap">
-                                  {anomaly.reason
-                                    ? getReasonBadges(anomaly.reason)
-                                    : "-"}
+                                  {getReasonBadges(anomaly.reason) || (
+                                    <span className="text-muted-foreground text-xs">
+                                      -
+                                    </span>
+                                  )}
                                 </div>
                               </TableCell>
                             </TableRow>
@@ -729,9 +735,11 @@ export default function AnomaliPage() {
                               </TableCell>
                               <TableCell>
                                 <div className="flex flex-wrap">
-                                  {anomaly.reason
-                                    ? getReasonBadges(anomaly.reason)
-                                    : "-"}
+                                  {getReasonBadges(anomaly.reason) || (
+                                    <span className="text-muted-foreground text-xs">
+                                      -
+                                    </span>
+                                  )}
                                 </div>
                               </TableCell>
                             </TableRow>

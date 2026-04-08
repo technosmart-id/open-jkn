@@ -256,66 +256,53 @@ export function LoginForm({
           </form>
 
           {/* Seed Database Section */}
-          <div className="mt-6 rounded-lg border bg-muted/50 p-4">
-            <div className="mb-3 flex items-center gap-2">
-              <Database className="h-4 w-4 text-muted-foreground" />
-              <span className="font-medium text-sm">Database Setup</span>
+          {seedStatus === "complete" ? (
+            <div className="mt-6 flex items-center justify-center gap-2 rounded-lg border border-green-200 bg-green-50 p-3 text-green-600 text-sm dark:border-green-900 dark:bg-green-950 dark:text-green-400">
+              <CheckCircle2 className="h-4 w-4" />
+              <span>Database seeded successfully!</span>
             </div>
-
-            {seedStatus === "complete" ? (
-              <div className="flex items-center gap-2 text-green-600 text-sm dark:text-green-400">
-                <CheckCircle2 className="h-4 w-4" />
-                <span>Database seeded successfully!</span>
+          ) : seedStatus === "error" ? (
+            <div className="mt-6 space-y-2 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950">
+              <div className="flex items-center gap-2 text-destructive text-sm">
+                <AlertCircle className="h-4 w-4" />
+                <span>{seedError || "Seeding failed"}</span>
               </div>
-            ) : seedStatus === "error" ? (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-destructive text-sm">
-                  <AlertCircle className="h-4 w-4" />
-                  <span>{seedError || "Seeding failed"}</span>
-                </div>
-                <Button
-                  className="h-8 text-xs"
-                  onClick={handleSeedDatabase}
-                  size="sm"
-                  variant="outline"
-                >
-                  Retry
-                </Button>
+              <Button
+                className="h-8 w-full text-xs"
+                onClick={handleSeedDatabase}
+                size="sm"
+                variant="outline"
+              >
+                Retry Seeding
+              </Button>
+            </div>
+          ) : isSeeding ? (
+            <div className="mt-6 space-y-2 rounded-lg border p-3">
+              <div className="flex items-center gap-2 text-sm">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>{getCurrentStepLabel()}</span>
               </div>
-            ) : isSeeding ? (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>{getCurrentStepLabel()}</span>
-                </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-primary/20">
-                  <div
-                    className="h-full animate-pulse bg-primary transition-all duration-300"
-                    style={{
-                      width: `${((SEED_STEPS.findIndex((s) => s.key === seedStatus) + 1) / SEED_STEPS.length) * 100}%`,
-                    }}
-                  />
-                </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-primary/20">
+                <div
+                  className="h-full animate-pulse bg-primary transition-all duration-300"
+                  style={{
+                    width: `${((SEED_STEPS.findIndex((s) => s.key === seedStatus) + 1) / SEED_STEPS.length) * 100}%`,
+                  }}
+                />
               </div>
-            ) : (
-              <div className="space-y-2">
-                <p className="text-muted-foreground text-xs">
-                  Seed sample data for development and testing. This will create
-                  facilities, participants, registrations, and payments.
-                </p>
-                <Button
-                  className="h-8 w-full text-xs"
-                  disabled={isPending}
-                  onClick={handleSeedDatabase}
-                  size="sm"
-                  variant="outline"
-                >
-                  <Database className="mr-2 h-3 w-3" />
-                  Seed Sample Data
-                </Button>
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <Button
+              className="mt-6 w-full"
+              disabled={isPending}
+              onClick={handleSeedDatabase}
+              size="sm"
+              variant="outline"
+            >
+              <Database className="mr-2 h-4 w-4" />
+              Seed Sample Data
+            </Button>
+          )}
 
           {/* Demo Credentials */}
           <div className="flex flex-col items-center gap-2">

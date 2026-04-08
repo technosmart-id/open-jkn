@@ -58,40 +58,79 @@ async function queryParticipantsForAnalysis(
 ): Promise<string> {
   const { participantSegment, isActive = true, limit = 50_000 } = options;
 
-  // Build where conditions
-  let whereClause: unknown;
+  try {
+    // Build where conditions
+    let whereClause: unknown;
 
-  if (isActive !== undefined && participantSegment) {
-    whereClause = and(
-      eq(participant.isActive, isActive),
-      eq(participant.participantSegment, participantSegment)
-    );
-  } else if (isActive !== undefined) {
-    whereClause = eq(participant.isActive, isActive);
-  } else if (participantSegment) {
-    whereClause = eq(participant.participantSegment, participantSegment);
+    if (isActive !== undefined && participantSegment) {
+      whereClause = and(
+        eq(participant.isActive, isActive),
+        eq(participant.participantSegment, participantSegment)
+      );
+    } else if (isActive !== undefined) {
+      whereClause = eq(participant.isActive, isActive);
+    } else if (participantSegment) {
+      whereClause = eq(participant.participantSegment, participantSegment);
+    }
+
+    const participants = await db.query.participant.findMany({
+      where: whereClause as never,
+      with: {
+        familyMembers: true,
+      },
+      limit,
+    });
+
+    // Transform data to ML expected format
+    const mlRecords = transformToMLFormat(participants);
+
+    // Write to temporary CSV file
+    await ensureDirs();
+    const timestamp = Date.now();
+    const tempFileName = `db-export-${timestamp}.csv`;
+    const tempFilePath = path.join(UPLOAD_DIR, tempFileName);
+
+    await writeMLCsv(tempFilePath, mlRecords);
+
+    return tempFilePath;
+  } catch (queryError) {
+    // Log detailed error for debugging
+    console.error("[Database Query Error]:", queryError);
+
+    // If relation query fails, try without relations (simple participant data only)
+    console.log("[Fallback] Trying simple query without relations...");
+
+    let whereClause: unknown;
+
+    if (isActive !== undefined && participantSegment) {
+      whereClause = and(
+        eq(participant.isActive, isActive),
+        eq(participant.participantSegment, participantSegment)
+      );
+    } else if (isActive !== undefined) {
+      whereClause = eq(participant.isActive, isActive);
+    } else if (participantSegment) {
+      whereClause = eq(participant.participantSegment, participantSegment);
+    }
+
+    const participants = await db.query.participant.findMany({
+      where: whereClause as never,
+      limit,
+    });
+
+    // Transform data to ML expected format (without family members)
+    const mlRecords = transformSimpleToMLFormat(participants);
+
+    // Write to temporary CSV file
+    await ensureDirs();
+    const timestamp = Date.now();
+    const tempFileName = `db-export-${timestamp}.csv`;
+    const tempFilePath = path.join(UPLOAD_DIR, tempFileName);
+
+    await writeMLCsv(tempFilePath, mlRecords);
+
+    return tempFilePath;
   }
-
-  const participants = await db.query.participant.findMany({
-    where: whereClause as never,
-    with: {
-      familyMembers: true,
-    },
-    limit,
-  });
-
-  // Transform data to ML expected format
-  const mlRecords = transformToMLFormat(participants);
-
-  // Write to temporary CSV file
-  await ensureDirs();
-  const timestamp = Date.now();
-  const tempFileName = `db-export-${timestamp}.csv`;
-  const tempFilePath = path.join(UPLOAD_DIR, tempFileName);
-
-  await writeMLCsv(tempFilePath, mlRecords);
-
-  return tempFilePath;
 }
 
 // Transform database records to ML expected format
@@ -188,6 +227,49 @@ function formatDate(date: Date | string): string {
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const year = d.getFullYear();
   return `${day}/${month}/${year}`;
+}
+
+// Simple transform without family members (fallback)
+function transformSimpleToMLFormat(
+  participants: Array<{
+    id: number;
+    bpjsNumber: string | null;
+    familyCardNumber: string;
+    birthDate: Date | string;
+    gender: "LAKI_LAKI" | "PEREMPUAN";
+    maritalStatus: "KAWIN" | "BELUM_KAWIN" | "JANDA" | "DUDA";
+    participantSegment: string;
+    treatmentClass: "I" | "II" | "III";
+    isActive: boolean;
+    statusPeserta: string | null;
+  }>
+): MLRecord[] {
+  const records: MLRecord[] = [];
+
+  for (const p of participants) {
+    const idPeserta = p.bpjsNumber || `P${p.id}`;
+    const idKeluarga = p.familyCardNumber;
+    const birthDate = formatDate(p.birthDate);
+    const peran = PISA_CODE_TO_ROLE["1"];
+    const kapitasi = p.isActive ? "YA" : "TIDAK";
+    const statusPeserta =
+      p.statusPeserta || (p.isActive ? "AKTIF" : "NON_AKTIF");
+
+    records.push({
+      PSTV01: idPeserta,
+      PSTV02: idKeluarga,
+      PSTV03: birthDate,
+      PSTV04: peran,
+      PSTV05: p.gender,
+      PSTV06: p.maritalStatus,
+      PSTV07: p.treatmentClass,
+      PSTV08: p.participantSegment,
+      PSTV15: kapitasi,
+      PSTV17: statusPeserta,
+    });
+  }
+
+  return records;
 }
 
 // Write ML format records to CSV
