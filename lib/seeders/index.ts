@@ -131,16 +131,33 @@ function createEmploymentIdentity(
   index: number,
   employerName: string
 ): typeof employmentIdentity.$inferInsert {
+  const city = faker.location.city();
+  const state = faker.location.state();
+
   return {
     participantId: index + 1,
     institutionName: employerName,
+    institutionCode: `INS${String(index + 1).padStart(6, "0")}`,
+    salaryPayerInstitution: employerName,
+    salaryPayerInstitutionCode: `PAY${String(index + 1).padStart(4, "0")}`,
+    oldEmployeeId: `OLD${String(index + 1).padStart(8, "0")}`,
     newEmployeeId: `EMP${String(index + 1).padStart(6, "0")}`,
-    position: faker.person.jobTitle(),
-    companyAddress: faker.location.streetAddress(),
+    grade: randomItem(["I", "II", "III", "IV"] as const),
+    rank: faker.person.jobTitle(),
     baseSalary: faker.number
       .int({ min: 3_000_000, max: 15_000_000 })
       .toString(),
     employmentStartDate: randomDate(new Date(2020, 0, 1), new Date()),
+    gradeStartDate: randomDate(new Date(2020, 0, 1), new Date()),
+    position: faker.person.jobTitle(),
+    employeeStatus: "TETAP",
+    companyAddress: faker.location.streetAddress(),
+    companyVillage: city,
+    companyDistrict: faker.location.county(),
+    companyCity: city,
+    companyProvince: state,
+    companyPostalCode: faker.location.zipCode(),
+    createdAt: new Date(),
     updatedAt: new Date(),
   };
 }
@@ -152,18 +169,30 @@ function createFamilyMember(
   const city = faker.location.city();
   const fullName = faker.person.fullName();
   const nameParts = fullName.split(" ");
+  const isStudent = isChild && randomBoolean();
+
   return {
     headOfFamilyId: participantIndex + 1,
     firstName: nameParts[0] || "",
     lastName: nameParts.slice(1).join(" ") || null,
     identityNumber: faker.string.numeric(16),
     relationship: isChild ? "ANAK_TANGGUNGAN" : "ISTRI",
-    pisaCode: isChild ? "4" : "2", // 4: Anak, 2: Istri
-    birthDate: faker.date.birthdate({ mode: "age", min: 1, max: 25 }),
-    isStudent: isChild && randomBoolean(),
+    pisaCode: (isChild ? "4" : "2") as "1" | "2" | "3" | "4" | "5", // 4: Anak, 2: Istri
+    childOrder: isChild ? faker.number.int({ min: 1, max: 5 }) : null,
+    isStudent,
     gender: faker.person.sex() === "female" ? "PEREMPUAN" : "LAKI_LAKI",
     birthPlace: city,
-    phoneNumber: faker.phone.number(),
+    birthDate: faker.date.birthdate({ mode: "age", min: 1, max: 25 }),
+    phoneNumber: faker.phone.number() || null,
+    email: faker.internet.email() || null,
+    bpjsNumber: null,
+    employeeId: null,
+    studentVerificationNumber: isStudent ? faker.string.alphanumeric(10) : null,
+    studentVerificationDate: isStudent ? new Date() : null,
+    photoUrl: null,
+    primaryFacilityId: null,
+    dentalFacilityId: null,
+    hasCommercialInsurance: false,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -229,23 +258,40 @@ function createParticipantData(
     identityNumber: faker.string.numeric(16),
     firstName: nameParts[0] || "",
     lastName: nameParts.slice(1).join(" ") || null,
+    nameOnCard: fullName,
+    pisaCode: "1", // Default to Peserta
     gender: faker.person.sex() === "female" ? "PEREMPUAN" : "LAKI_LAKI",
-    bloodType: "O" as const,
+    bloodType: "O",
     birthPlace: city,
     birthDate: faker.date
       .birthdate({ mode: "age", min: 18, max: 80 })
       .toISOString(),
-    religion: "ISLAM" as const,
-    maritalStatus: "KAWIN" as const,
+    religion: "ISLAM",
+    maritalStatus: "KAWIN",
     phoneNumber: faker.phone.number(),
     email: faker.internet.email(),
     addressStreet: street,
+    addressRt: faker.string.numeric(3),
+    addressRw: faker.string.numeric(3),
+    addressVillage: city,
+    addressDistrict: faker.location.county(),
     addressCity: city,
     addressProvince: state,
     addressPostalCode: faker.location.zipCode(),
+    mailingAddressSame: true,
+    npwp: faker.string.numeric(15),
+    photoUrl: null,
+    occupation: faker.person.jobTitle(),
+    monthlyIncome: faker.number
+      .int({ min: 3_000_000, max: 15_000_000 })
+      .toString(),
+    hasCommercialInsurance: false,
+    isLifetimeMember: true,
     participantSegment: segment,
     treatmentClass: randomItem(TREATMENT_CLASSES),
     isActive,
+    statusPeserta: isActive ? "AKTIF" : "NON_AKTIF",
+    statusBayar: "LUNAS",
     deactivatedAt: isActive
       ? null
       : randomDate(new Date(2023, 0, 1), new Date()),
