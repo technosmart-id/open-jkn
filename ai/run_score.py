@@ -26,9 +26,12 @@ import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from anomaly_detection.config import OUTPUT_DIR
+from anomaly_detection.config import OUTPUT_DIR as DEFAULT_OUTPUT_DIR
 from anomaly_detection.score import load_artifacts, score_dataframe
 from anomaly_detection.evaluate import print_summary
+
+# Allow override via environment variable (for containerized environments)
+OUTPUT_DIR = os.environ.get("OPENJKN_AI_OUTPUT_DIR", DEFAULT_OUTPUT_DIR)
 
 
 def main():

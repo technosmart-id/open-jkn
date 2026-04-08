@@ -2,10 +2,13 @@ import { spawn } from "child_process";
 import { existsSync } from "fs";
 import { mkdir, writeFile } from "fs/promises";
 import { type NextRequest, NextResponse } from "next/server";
+import os from "os";
 import path from "path";
 
-const UPLOAD_DIR = path.join(process.cwd(), "uploads", "ai");
-const OUTPUT_DIR = path.join(process.cwd(), "ai", "outputs_enrollment");
+// Use OS temp directory for better compatibility in containerized environments
+const TEMP_BASE = path.join(os.tmpdir(), "openjkn-ai");
+const UPLOAD_DIR = path.join(TEMP_BASE, "uploads");
+const OUTPUT_DIR = path.join(TEMP_BASE, "outputs_enrollment");
 
 // Ensure directories exist
 async function ensureDirs() {
@@ -126,7 +129,12 @@ function runPythonScript(
   dataPath: string
 ): Promise<string> {
   return new Promise((resolve, reject) => {
-    const python = spawn("python", [scriptPath, dataPath]);
+    const python = spawn("python", [scriptPath, dataPath], {
+      env: {
+        ...process.env,
+        OPENJKN_AI_OUTPUT_DIR: OUTPUT_DIR,
+      },
+    });
     let output = "";
     let errorOutput = "";
 

@@ -1,5 +1,6 @@
 import { existsSync } from "fs";
 import { NextResponse } from "next/server";
+import os from "os";
 import path from "path";
 
 const MODEL_DIR = path.join(
@@ -8,7 +9,8 @@ const MODEL_DIR = path.join(
   "anomaly_detection",
   "saved_models"
 );
-const OUTPUT_DIR = path.join(process.cwd(), "ai", "outputs_enrollment");
+// Use OS temp directory for consistency with other AI routes
+const OUTPUT_DIR = path.join(os.tmpdir(), "openjkn-ai", "outputs_enrollment");
 
 // Required model files
 const REQUIRED_FILES = [

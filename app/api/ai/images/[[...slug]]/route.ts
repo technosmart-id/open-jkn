@@ -1,9 +1,11 @@
 import { existsSync } from "fs";
 import { readFile } from "fs/promises";
 import { type NextRequest, NextResponse } from "next/server";
+import os from "os";
 import path from "path";
 
-const OUTPUT_DIR = path.join(process.cwd(), "ai", "outputs_enrollment");
+// Use OS temp directory for consistency with other AI routes
+const OUTPUT_DIR = path.join(os.tmpdir(), "openjkn-ai", "outputs_enrollment");
 
 // Map route paths to actual file names
 const FILE_MAP: Record<string, string> = {

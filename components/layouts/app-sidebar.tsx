@@ -6,6 +6,7 @@ import {
   CreditCard,
   Home,
   Hospital,
+  RefreshCw,
   Users,
   Wallet,
 } from "lucide-react";
@@ -64,6 +65,11 @@ const navMain = [
     title: "Analitik & AI",
     url: "/analitik",
     icon: Brain,
+  },
+  {
+    title: "Sync openIMIS",
+    url: "/sync",
+    icon: RefreshCw,
   },
 ];
 
