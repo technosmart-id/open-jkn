@@ -7,6 +7,16 @@ const nextConfig: NextConfig = {
   turbopack: {},
   // Use Turbopack's serverExternalPackages for externals
   serverExternalPackages: ["svix"],
+  // Configure image optimization
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
+    unoptimized: true,
+  },
   webpack: (config, { isServer }) => {
     if (isServer) {
       config.externals = [...(config.externals || []), "svix"];

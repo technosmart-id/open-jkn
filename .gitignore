@@ -45,3 +45,7 @@ next-env.d.ts
 uploads/*
 !uploads/.gitkeep
 .claude/
+
+# AI module - generated outputs and models
+ai/outputs_enrollment/
+ai/anomaly_detection/saved_models/

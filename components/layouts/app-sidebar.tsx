@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Brain,
   ClipboardList,
   CreditCard,
   Home,
@@ -59,6 +60,11 @@ const navMain = [
     title: "Bank & Rekening",
     url: "/bank",
     icon: Wallet,
+  },
+  {
+    title: "Analitik & AI",
+    url: "/analitik",
+    icon: Brain,
   },
   {
     title: "Database Seeders",
