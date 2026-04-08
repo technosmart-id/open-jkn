@@ -1,17 +1,9 @@
 "use client";
 
-import { AlertTriangle, BarChart3, Brain, Users } from "lucide-react";
+import { BarChart3, Brain, Users } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface ModelStatus {
   modelsReady: boolean;
@@ -20,7 +12,6 @@ interface ModelStatus {
 }
 
 export default function DashboardPage() {
-  const [timeRange, setTimeRange] = useState("30d");
   const [modelStatus, setModelStatus] = useState<ModelStatus | null>(null);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
@@ -38,62 +29,21 @@ export default function DashboardPage() {
     setImageErrors((prev) => ({ ...prev, [imageKey]: true }));
   };
 
-  if (!modelStatus?.hasOutput) {
-    return (
-      <div className="container max-w-7xl py-8">
-        <div className="mb-8">
-          <h1 className="font-bold text-3xl tracking-tight">
-            Dashboard Deteksi Anomali
-          </h1>
-          <p className="mt-2 text-muted-foreground">
+  return (
+    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-bold text-2xl">Dashboard Deteksi Anomali</h1>
+          <p className="text-muted-foreground">
             Visualisasi metrik dan statistik deteksi anomali data kepesertaan
           </p>
-        </div>
-
-        <Alert className="border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950">
-          <AlertTriangle className="h-4 w-4 text-orange-600" />
-          <AlertTitle className="font-semibold text-sm">
-            Belum Ada Data Visualisasi
-          </AlertTitle>
-          <AlertDescription className="text-xs">
-            Jalankan training script terlebih dahulu untuk menghasilkan
-            visualisasi:{" "}
-            <code className="rounded bg-black/10 px-1 py-0.5 dark:bg-white/10">
-              cd ai && python run_train.py
-            </code>
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
-  return (
-    <div className="container max-w-7xl py-8">
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-bold text-3xl tracking-tight">
-              Dashboard Deteksi Anomali
-            </h1>
-            <p className="mt-2 text-muted-foreground">
-              Visualisasi metrik dan statistik deteksi anomali data kepesertaan
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge variant={modelStatus.modelsReady ? "default" : "secondary"}>
-              {modelStatus.modelsReady ? "Model Ready" : "Need Train"}
-            </Badge>
-          </div>
         </div>
       </div>
 
       {/* Main Dashboard Visualization */}
-      <Card className="mb-6">
+      <Card>
         <CardHeader>
           <CardTitle>Anomaly Dashboard</CardTitle>
-          <CardDescription>
-            Visualisasi lengkap hasil deteksi anomali
-          </CardDescription>
         </CardHeader>
         <CardContent>
           {hasImage("anomaly_dashboard.png") ? (
@@ -110,8 +60,8 @@ export default function DashboardPage() {
             <div className="flex aspect-video items-center justify-center rounded-lg bg-muted">
               <div className="text-center">
                 <BarChart3 className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-                <p className="text-muted-foreground">
-                  Dashboard visualization not available
+                <p className="text-muted-foreground text-sm">
+                  Visualisasi belum tersedia
                 </p>
               </div>
             </div>
@@ -120,14 +70,11 @@ export default function DashboardPage() {
       </Card>
 
       {/* Secondary Visualizations */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         {/* Age Distribution */}
         <Card>
           <CardHeader>
             <CardTitle>Distribusi Usia: Normal vs Anomali</CardTitle>
-            <CardDescription>
-              Perbandingan distribusi usia antara data normal dan anomali
-            </CardDescription>
           </CardHeader>
           <CardContent>
             {hasImage("age_distribution.png") ? (
@@ -145,7 +92,7 @@ export default function DashboardPage() {
                 <div className="text-center">
                   <Users className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
                   <p className="text-muted-foreground text-sm">
-                    Age distribution visualization not available
+                    Visualisasi distribusi usia belum tersedia
                   </p>
                 </div>
               </div>
@@ -156,10 +103,7 @@ export default function DashboardPage() {
         {/* Training History */}
         <Card>
           <CardHeader>
-            <CardTitle>Riwayat Training Autoencoder</CardTitle>
-            <CardDescription>
-              Loss curve selama proses training model
-            </CardDescription>
+            <CardTitle>Riwayat Training Model</CardTitle>
           </CardHeader>
           <CardContent>
             {hasImage("ae_training_history.png") ? (
@@ -177,7 +121,7 @@ export default function DashboardPage() {
                 <div className="text-center">
                   <Brain className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
                   <p className="text-muted-foreground text-sm">
-                    Training history visualization not available
+                    Visualisasi riwayat training belum tersedia
                   </p>
                 </div>
               </div>
@@ -187,116 +131,89 @@ export default function DashboardPage() {
       </div>
 
       {/* Model Info */}
-      <Card className="mt-6">
+      <Card>
         <CardHeader>
-          <CardTitle>Model Information</CardTitle>
-          <CardDescription>
-            Konfigurasi dan parameter model deteksi anomali
-          </CardDescription>
+          <CardTitle>Informasi Model</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-6 md:grid-cols-3">
+          <p className="mb-4 text-muted-foreground text-sm">
+            Sistem deteksi anomali menggunakan kombinasi tiga pendekatan untuk
+            akurasi maksimal:
+          </p>
+          <div className="grid gap-4 md:grid-cols-3">
             <div>
               <h4 className="mb-2 font-semibold">Autoencoder</h4>
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Encoding Dim</span>
-                  <span className="font-medium">8</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Epochs</span>
-                  <span className="font-medium">50</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Batch Size</span>
-                  <span className="font-medium">256</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Learning Rate</span>
-                  <span className="font-medium">0.001</span>
-                </div>
-              </div>
+              <p className="text-muted-foreground text-sm">
+                Neural network yang belajar merepresentasikan data normal.
+                Rekonstruksi error tinggi menunjukkan anomali.
+              </p>
             </div>
-
             <div>
               <h4 className="mb-2 font-semibold">Isolation Forest</h4>
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Contamination</span>
-                  <span className="font-medium">1%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Estimators</span>
-                  <span className="font-medium">200</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Threshold</span>
-                  <span className="font-medium">P99</span>
-                </div>
-              </div>
+              <p className="text-muted-foreground text-sm">
+                Algoritma unsupervised yang mengisolasi outlier dengan membangun
+                decision tree secara acak.
+              </p>
             </div>
-
             <div>
               <h4 className="mb-2 font-semibold">Business Rules</h4>
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Total Rules</span>
-                  <span className="font-medium">8</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Hard Rules</span>
-                  <span className="font-medium">4</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Soft Rules</span>
-                  <span className="font-medium">4</span>
-                </div>
-              </div>
+              <p className="text-muted-foreground text-sm">
+                Aturan domain-specific untuk validasi data seperti konsistensi
+                usia-peran dan struktur keluarga.
+              </p>
             </div>
           </div>
+        </CardContent>
+      </Card>
 
-          {/* Detected Anomalies Summary */}
-          <div className="mt-6 border-t pt-6">
-            <h4 className="mb-3 font-semibold">Business Rules Deteksi</h4>
-            <div className="grid gap-2 text-sm md:grid-cols-2">
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-red-500" />
-                <span>UMUR_NEGATIF - Usia negatif</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-red-500" />
-                <span>
-                  AKTIF_UMUR_{">"}110 - Peserta aktif {">"}110 tahun
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-orange-500" />
-                <span>KEPALA_KELUARGA_ANAK - Kepala keluarga anak-anak</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-orange-500" />
-                <span>
-                  ANAK_TAPI_UMUR_{">"}25 - Anak dengan usia {">"}25 tahun
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-yellow-500" />
-                <span>
-                  KAWIN_UMUR_{"<"}16 - Menikah di usia {"<"}16 tahun
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-yellow-500" />
-                <span>KELUARGA_BESAR - Anggota keluarga {">"}10 orang</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-blue-500" />
-                <span>TANPA_KEPALA_KELUARGA - Keluarga tanpa kepala</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-blue-500" />
-                <span>RASIO_AKTIF_RENDAH - Rasio anggota aktif rendah</span>
-              </div>
+      {/* Business Rules Reference */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Aturan Validasi Data</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-4 text-muted-foreground text-sm">
+            Berikut adalah aturan yang digunakan untuk mendeteksi anomali dalam
+            data kepesertaan:
+          </p>
+          <div className="grid gap-2 text-sm md:grid-cols-2">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-red-500" />
+              <span>UMUR_NEGATIF - Usia negatif</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-red-500" />
+              <span>
+                AKTIF_UMUR_{">"}110 - Peserta aktif {">"}110 tahun
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-orange-500" />
+              <span>KEPALA_KELUARGA_ANAK - Kepala keluarga anak-anak</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-orange-500" />
+              <span>
+                ANAK_TAPI_UMUR_{">"}25 - Anak dengan usia {">"}25 tahun
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-yellow-500" />
+              <span>
+                KAWIN_UMUR_{"<"}16 - Menikah di usia {"<"}16 tahun
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-yellow-500" />
+              <span>KELUARGA_BESAR - Anggota keluarga {">"}10 orang</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-blue-500" />
+              <span>TANPA_KEPALA_KELUARGA - Keluarga tanpa kepala</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-blue-500" />
+              <span>RASIO_AKTIF_RENDAH - Rasio anggota aktif rendah</span>
             </div>
           </div>
         </CardContent>

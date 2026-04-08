@@ -14,13 +14,7 @@ import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import {
   Table,
@@ -147,24 +141,18 @@ export default function AnomaliPage() {
     ));
 
   return (
-    <div className="container max-w-7xl py-8">
-      <div className="mb-8">
-        <h1 className="font-bold text-3xl tracking-tight">
-          Deteksi Anomali Kepesertaan
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          Upload data kepesertaan BPJS untuk mendeteksi pola anomali menggunakan
-          Machine Learning
+    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+      <div>
+        <h1 className="font-bold text-2xl">Deteksi Anomali Kepesertaan</h1>
+        <p className="text-muted-foreground">
+          Upload data kepesertaan BPJS untuk mendeteksi pola anomali
         </p>
       </div>
 
       {/* Upload Section */}
-      <Card className="mb-6">
+      <Card>
         <CardHeader>
           <CardTitle>Upload Data</CardTitle>
-          <CardDescription>
-            Unggah file data kepesertaan dalam format .csv atau .dta (Stata)
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-start gap-4 sm:flex-row">
@@ -253,14 +241,14 @@ export default function AnomaliPage() {
       </Card>
 
       {/* Model Info */}
-      <Alert className="mb-6">
+      <Alert>
         <Info className="h-4 w-4" />
-        <AlertTitle>Tentang Model Deteksi</AlertTitle>
+        <AlertTitle>Tentang Deteksi Anomali</AlertTitle>
         <AlertDescription className="text-sm">
-          Sistem menggunakan hybrid approach: <strong>Autoencoder</strong> (deep
-          learning) untuk mendeteksi pola tidak wajar,{" "}
+          Sistem menggunakan kombinasi tiga pendekatan:{" "}
+          <strong>Autoencoder</strong> (deep learning) untuk pola tidak wajar,{" "}
           <strong>Isolation Forest</strong> untuk outlier detection, dan{" "}
-          <strong>Business Rules</strong> untuk validasi aturan domain-specific.
+          <strong>Business Rules</strong> untuk validasi aturan domain JKN.
         </AlertDescription>
       </Alert>
 
@@ -268,11 +256,11 @@ export default function AnomaliPage() {
       {analysisComplete && (
         <>
           {/* Summary Cards */}
-          <div className="mb-6 grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-4">
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="font-medium text-muted-foreground text-sm">
-                  Total Records
+                  Total Data
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -286,7 +274,7 @@ export default function AnomaliPage() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="font-medium text-muted-foreground text-sm">
-                  Anomalies Found
+                  Anomali Terdeteksi
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -302,7 +290,7 @@ export default function AnomaliPage() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="font-medium text-muted-foreground text-sm">
-                  Rule-Based
+                  Business Rules
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -310,7 +298,7 @@ export default function AnomaliPage() {
                   {ruleBasedCount}
                 </div>
                 <p className="mt-1 text-muted-foreground text-xs">
-                  Business rules violations
+                  Pelanggaran aturan
                 </p>
               </CardContent>
             </Card>
@@ -318,7 +306,7 @@ export default function AnomaliPage() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="font-medium text-muted-foreground text-sm">
-                  Model-Based
+                  Model ML
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -326,7 +314,7 @@ export default function AnomaliPage() {
                   {modelBasedCount}
                 </div>
                 <p className="mt-1 text-muted-foreground text-xs">
-                  ML-detected anomalies
+                  Deteksi Machine Learning
                 </p>
               </CardContent>
             </Card>
@@ -338,9 +326,6 @@ export default function AnomaliPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Detail Anomali</CardTitle>
-                  <CardDescription>
-                    Daftar kepesertaan yang terdeteksi anomali
-                  </CardDescription>
                 </div>
                 <Button size="sm" variant="outline">
                   <Download className="mr-2 h-4 w-4" />
@@ -353,7 +338,7 @@ export default function AnomaliPage() {
                 <TabsList className="mb-4">
                   <TabsTrigger value="all">Semua ({anomalyCount})</TabsTrigger>
                   <TabsTrigger value="rule">
-                    Rule Only (
+                    Aturan (
                     {
                       mockAnomalies.filter(
                         (a) => a.anomaly_source === "rule_only"
@@ -362,7 +347,7 @@ export default function AnomaliPage() {
                     )
                   </TabsTrigger>
                   <TabsTrigger value="model">
-                    Model Only (
+                    ML Model (
                     {
                       mockAnomalies.filter(
                         (a) => a.anomaly_source === "model_only"
@@ -371,7 +356,7 @@ export default function AnomaliPage() {
                     )
                   </TabsTrigger>
                   <TabsTrigger value="hybrid">
-                    Both (
+                    Keduanya (
                     {
                       mockAnomalies.filter(
                         (a) => a.anomaly_source === "model+rule"
@@ -389,8 +374,8 @@ export default function AnomaliPage() {
                           <TableHead>ID Peserta</TableHead>
                           <TableHead>ID Keluarga</TableHead>
                           <TableHead>Usia</TableHead>
-                          <TableHead>Score</TableHead>
-                          <TableHead>Source</TableHead>
+                          <TableHead>Skor</TableHead>
+                          <TableHead>Sumber</TableHead>
                           <TableHead>Alasan</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -443,7 +428,11 @@ export default function AnomaliPage() {
                                 {anomaly.anomaly_source === "model_only" && (
                                   <AlertTriangle className="h-3 w-3" />
                                 )}
-                                {anomaly.anomaly_source}
+                                {anomaly.anomaly_source === "model+rule"
+                                  ? "Keduanya"
+                                  : anomaly.anomaly_source === "rule_only"
+                                    ? "Aturan"
+                                    : "ML Model"}
                               </Badge>
                             </TableCell>
                             <TableCell>
@@ -498,8 +487,8 @@ export default function AnomaliPage() {
                         <TableRow>
                           <TableHead>ID Peserta</TableHead>
                           <TableHead>ID Keluarga</TableHead>
-                          <TableHead>Score</TableHead>
-                          <TableHead>Top Features</TableHead>
+                          <TableHead>Skor</TableHead>
+                          <TableHead>Fitur Teratas</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -535,7 +524,7 @@ export default function AnomaliPage() {
                           <TableHead>ID Peserta</TableHead>
                           <TableHead>ID Keluarga</TableHead>
                           <TableHead>Usia</TableHead>
-                          <TableHead>Score</TableHead>
+                          <TableHead>Skor</TableHead>
                           <TableHead>Alasan</TableHead>
                         </TableRow>
                       </TableHeader>
