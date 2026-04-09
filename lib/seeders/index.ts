@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker/locale/id_ID";
 import { generateId } from "better-auth";
+import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { account, session, user } from "@/lib/db/schema/auth";
 import {
@@ -59,7 +60,8 @@ function randomDate(start: Date, end: Date): Date {
 export async function seedHealthcareFacilities(count = 20) {
   console.log(`Seeding ${count} healthcare facilities...`);
 
-  const facilities: (typeof healthcareFacility.$inferInsert)[] = [];
+  const facilities: Array<Omit<typeof healthcareFacility.$inferInsert, "id">> =
+    [];
   for (let i = 0; i < count; i++) {
     // Use methods that work with Indonesian locale
     const city = faker.location.city();
@@ -130,7 +132,7 @@ export async function seedDentalFacilities(count = 10) {
 function createEmploymentIdentity(
   index: number,
   employerName: string
-): typeof employmentIdentity.$inferInsert {
+): Omit<typeof employmentIdentity.$inferInsert, "id"> {
   const city = faker.location.city();
   const state = faker.location.state();
 
@@ -142,7 +144,7 @@ function createEmploymentIdentity(
     salaryPayerInstitutionCode: `PAY${String(index + 1).padStart(4, "0")}`,
     oldEmployeeId: `OLD${String(index + 1).padStart(8, "0")}`,
     newEmployeeId: `EMP${String(index + 1).padStart(6, "0")}`,
-    grade: "I" as "I" | "II" | "III" | "IV" | "A" | "B" | "C" | "D" | "E",
+    grade: "I",
     rank: faker.person.jobTitle(),
     baseSalary: faker.number
       .int({ min: 3_000_000, max: 15_000_000 })
@@ -150,7 +152,7 @@ function createEmploymentIdentity(
     employmentStartDate: randomDate(new Date(2020, 0, 1), new Date()),
     gradeStartDate: randomDate(new Date(2020, 0, 1), new Date()),
     position: faker.person.jobTitle(),
-    employeeStatus: "TETAP" as "TETAP" | "KONTRAK" | "PARUH_WAKTU",
+    employeeStatus: "TETAP",
     companyAddress: faker.location.streetAddress(),
     companyVillage: city,
     companyDistrict: faker.location.county(),
@@ -164,7 +166,7 @@ function createEmploymentIdentity(
 
 function createFamilyMember(
   participantIndex: number
-): typeof familyMember.$inferInsert {
+): Omit<typeof familyMember.$inferInsert, "id"> {
   const isChild = randomBoolean();
   const city = faker.location.city();
   const fullName = faker.person.fullName();
@@ -181,7 +183,7 @@ function createFamilyMember(
     lastName: nameParts.slice(1).join(" ") || null,
     identityNumber: faker.string.numeric(16),
     relationship: isChild ? "ANAK_TANGGUNGAN" : "ISTRI",
-    pisaCode: (isChild ? "4" : "2") as "1" | "2" | "3" | "4" | "5",
+    pisaCode: isChild ? "4" : "2",
     childOrder: isChild ? faker.number.int({ min: 1, max: 5 }) : null,
     isStudent,
     gender: faker.person.sex() === "female" ? "PEREMPUAN" : "LAKI_LAKI",
@@ -197,6 +199,8 @@ function createFamilyMember(
     primaryFacilityId: null,
     dentalFacilityId: null,
     hasCommercialInsurance: false,
+    commercialInsurancePolicyNumber: null,
+    commercialInsuranceCompanyName: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -204,23 +208,12 @@ function createFamilyMember(
   return data;
 }
 
-function createBankAccount(index: number): typeof bankInformation.$inferInsert {
+function createBankAccount(
+  index: number
+): Omit<typeof bankInformation.$inferInsert, "id"> {
   return {
     participantId: index + 1,
-    bankName: randomItem(BANKS) as
-      | "MANDIRI"
-      | "BRI"
-      | "BNI"
-      | "BCA"
-      | "BCA_SYARIAH"
-      | "BRI_SYARIAH"
-      | "BNI_SYARIAH"
-      | "BTN"
-      | "JATENG"
-      | "JATIM"
-      | "JB"
-      | "SUMUT"
-      | "LAINNYA",
+    bankName: randomItem(BANKS),
     accountNumber: faker.finance.accountNumber(10),
     accountHolderName: faker.person.fullName(),
     autoDebitAuthorized: randomBoolean(),
@@ -235,7 +228,7 @@ function createPrimaryFacility(
   index: number,
   facilityId: number,
   treatmentClass: (typeof TREATMENT_CLASSES)[number]
-): typeof participantHealthcareFacility.$inferInsert {
+): Omit<typeof participantHealthcareFacility.$inferInsert, "id"> {
   return {
     participantId: index + 1,
     primaryFacilityId: facilityId,
@@ -249,7 +242,7 @@ function createDentalFacility(
   index: number,
   facilityId: number,
   treatmentClass: (typeof TREATMENT_CLASSES)[number]
-): typeof participantHealthcareFacility.$inferInsert {
+): Omit<typeof participantHealthcareFacility.$inferInsert, "id"> {
   return {
     participantId: index + 1,
     dentalFacilityId: facilityId,
@@ -263,7 +256,7 @@ function createParticipantData(
   index: number,
   segment: (typeof SEGMENTS)[number],
   isActive: boolean
-): typeof participant.$inferInsert & {
+): Omit<typeof participant.$inferInsert, "id"> & {
   treatmentClass: (typeof TREATMENT_CLASSES)[number];
 } {
   const city = faker.location.city();
@@ -288,10 +281,11 @@ function createParticipantData(
     firstName: nameParts[0] || "",
     lastName: nameParts.slice(1).join(" ") || null,
     nameOnCard: fullName,
+    pisaCode: "1",
     gender: faker.person.sex() === "female" ? "PEREMPUAN" : "LAKI_LAKI",
     bloodType: "O",
     birthPlace: city,
-    birthDate: formatDate(birthDate) as any,
+    birthDate: formatDate(birthDate),
     religion: "ISLAM",
     maritalStatus: "KAWIN",
     phoneNumber: faker.phone.number(),
@@ -305,29 +299,47 @@ function createParticipantData(
     addressProvince: state,
     addressPostalCode: faker.location.zipCode(),
     mailingAddressSame: true,
+    mailingAddressStreet: null,
+    mailingAddressRt: null,
+    mailingAddressRw: null,
+    mailingAddressVillage: null,
+    mailingAddressDistrict: null,
+    mailingAddressCity: null,
+    mailingAddressProvince: null,
+    mailingAddressPostalCode: null,
     npwp: faker.string.numeric(15),
+    photoUrl: null,
     occupation: faker.person.jobTitle(),
     monthlyIncome: faker.number
       .int({ min: 3_000_000, max: 15_000_000 })
       .toString(),
+    visaNumber: null,
+    hasCommercialInsurance: false,
+    commercialInsurancePolicyNumber: null,
+    commercialInsuranceCompanyName: null,
     participantSegment: segment,
     treatmentClass: randomItem(TREATMENT_CLASSES),
+    isLifetimeMember: true,
+    userId: null,
     isActive,
     statusPeserta: isActive ? "AKTIF" : "NON_AKTIF",
     statusBayar: "LUNAS",
-    isLifetimeMember: true,
-    hasCommercialInsurance: false,
+    effectiveDate: null,
+    expiryDate: null,
   };
-
-  // Only add deactivated fields if inactive
-  if (!isActive) {
-    data.deactivatedAt = randomDate(new Date(2023, 0, 1), new Date());
-    data.deactivationReason = "Non-payment";
-  }
 
   // Add timestamps last
   data.createdAt = randomDate(new Date(2023, 0, 1), new Date());
   data.updatedAt = new Date();
+
+  // Only add deactivated fields if inactive
+  if (isActive) {
+    data.deactivatedAt = null;
+    data.deactivationReason = null;
+  } else {
+    data.deactivatedAt = randomDate(new Date(2023, 0, 1), new Date());
+    data.deactivationReason = "Non-payment";
+  }
 
   return data;
 }
@@ -339,22 +351,55 @@ export async function seedParticipants(count = 50) {
   const faskesList = await db.query.healthcareFacility.findMany();
   const gigiList = await db.query.dentalFacility.findMany();
 
-  const participants: (typeof participant.$inferInsert)[] = [];
-  const employmentIdentities: (typeof employmentIdentity.$inferInsert)[] = [];
-  const familyMembers: (typeof familyMember.$inferInsert)[] = [];
-  const banks: (typeof bankInformation.$inferInsert)[] = [];
-  const participantFacilities: (typeof participantHealthcareFacility.$inferInsert)[] =
-    [];
+  // Use plain arrays to let Drizzle infer columns from actual data
+  const participants: Record<string, unknown>[] = [];
+  const employmentIdentities: Record<string, unknown>[] = [];
+  const familyMembers: Record<string, unknown>[] = [];
+  const banks: Record<string, unknown>[] = [];
+  const participantFacilities: Record<string, unknown>[] = [];
 
   for (let i = 0; i < count; i++) {
     const segment = randomItem(SEGMENTS);
     const isActive = randomBoolean();
 
-    const participantData = createParticipantData(i, segment, isActive);
+    const participantData = createParticipantData(
+      i,
+      segment,
+      isActive
+    ) as Record<string, unknown>;
+    delete participantData.id;
     participants.push(participantData);
   }
 
-  await db.insert(participant).values(participants);
+  // Use raw SQL to insert participants, excluding the 'id' column
+  // Drizzle's ORM always includes all columns from the schema, including auto-increment
+  for (const p of participants) {
+    await db.execute(
+      sql`INSERT INTO "participant" (
+        "bpjsNumber", "familyCardNumber", "identityNumber", "firstName", "lastName", "nameOnCard", "pisaCode",
+        "gender", "bloodType", "birthPlace", "birthDate", "religion", "maritalStatus", "phoneNumber", "email",
+        "addressStreet", "addressRt", "addressRw", "addressVillage", "addressDistrict", "addressCity", "addressProvince",
+        "addressPostalCode", "mailingAddressSame", "mailingAddressStreet", "mailingAddressRt", "mailingAddressRw",
+        "mailingAddressVillage", "mailingAddressDistrict", "mailingAddressCity", "mailingAddressProvince",
+        "mailingAddressPostalCode", "npwp", "photoUrl", "occupation", "monthlyIncome", "visaNumber",
+        "hasCommercialInsurance", "commercialInsurancePolicyNumber", "commercialInsuranceCompanyName",
+        "participantSegment", "treatmentClass", "isLifetimeMember", "userId", "createdAt", "updatedAt",
+        "effectiveDate", "expiryDate", "isActive", "statusPeserta", "statusBayar", "deactivatedAt",
+        "deactivationReason"
+      ) VALUES (
+        ${p.bpjsNumber}, ${p.familyCardNumber}, ${p.identityNumber}, ${p.firstName}, ${p.lastName}, ${p.nameOnCard}, ${p.pisaCode},
+        ${p.gender}, ${p.bloodType}, ${p.birthPlace}, ${p.birthDate}, ${p.religion}, ${p.maritalStatus}, ${p.phoneNumber}, ${p.email},
+        ${p.addressStreet}, ${p.addressRt}, ${p.addressRw}, ${p.addressVillage}, ${p.addressDistrict}, ${p.addressCity}, ${p.addressProvince},
+        ${p.addressPostalCode}, ${p.mailingAddressSame}, ${p.mailingAddressStreet}, ${p.mailingAddressRt}, ${p.mailingAddressRw},
+        ${p.mailingAddressVillage}, ${p.mailingAddressDistrict}, ${p.mailingAddressCity}, ${p.mailingAddressProvince},
+        ${p.mailingAddressPostalCode}, ${p.npwp}, ${p.photoUrl}, ${p.occupation}, ${p.monthlyIncome}, ${p.visaNumber},
+        ${p.hasCommercialInsurance}, ${p.commercialInsurancePolicyNumber}, ${p.commercialInsuranceCompanyName},
+        ${p.participantSegment}, ${p.treatmentClass}, ${p.isLifetimeMember}, ${p.userId}, ${p.createdAt}, ${p.updatedAt},
+        ${p.effectiveDate}, ${p.expiryDate}, ${p.isActive}, ${p.statusPeserta}, ${p.statusBayar}, ${p.deactivatedAt},
+        ${p.deactivationReason}
+      )`
+    );
+  }
 
   // Get the inserted participants with their actual IDs
   const insertedParticipants = await db.query.participant.findMany();
@@ -368,59 +413,69 @@ export async function seedParticipants(count = 50) {
 
     // Add employment identity for PPU
     if (isEmployed) {
-      employmentIdentities.push(
-        createEmploymentIdentity(actualParticipantId - 1, faker.company.name())
-      );
-      // Fix the participantId to use the actual ID
-      employmentIdentities.at(-1)!.participantId = actualParticipantId;
+      const empData = createEmploymentIdentity(
+        actualParticipantId - 1,
+        faker.company.name()
+      ) as Record<string, unknown>;
+      delete empData.id;
+      empData.participantId = actualParticipantId;
+      employmentIdentities.push(empData);
     }
 
     // Add family members
     if (hasFamily) {
       const familyCount = faker.number.int({ min: 1, max: 4 });
       for (let j = 0; j < familyCount; j++) {
-        familyMembers.push(createFamilyMember(actualParticipantId - 1));
-        // Fix the headOfFamilyId to use the actual ID
-        familyMembers.at(-1)!.headOfFamilyId = actualParticipantId;
+        const famData = createFamilyMember(actualParticipantId - 1) as Record<
+          string,
+          unknown
+        >;
+        delete famData.id;
+        famData.headOfFamilyId = actualParticipantId;
+        familyMembers.push(famData);
       }
     }
 
     // Add bank account
-    banks.push(createBankAccount(actualParticipantId - 1));
-    // Fix the participantId to use the actual ID
-    banks.at(-1)!.participantId = actualParticipantId;
+    const bankData = createBankAccount(actualParticipantId - 1) as Record<
+      string,
+      unknown
+    >;
+    delete bankData.id;
+    bankData.participantId = actualParticipantId;
+    banks.push(bankData);
 
     // Assign facilities (1 primary, 1 dental)
     const treatmentClass = participantRecord.treatmentClass;
     if (faskesList.length > 0) {
-      participantFacilities.push(
-        createPrimaryFacility(
-          actualParticipantId - 1,
-          randomItem(faskesList).id,
-          treatmentClass
-        )
-      );
-      // Fix the participantId to use the actual ID
-      participantFacilities.at(-1)!.participantId = actualParticipantId;
+      const facilityData = createPrimaryFacility(
+        actualParticipantId - 1,
+        randomItem(faskesList).id,
+        treatmentClass
+      ) as Record<string, unknown>;
+      delete facilityData.id;
+      facilityData.participantId = actualParticipantId;
+      participantFacilities.push(facilityData);
     }
 
     if (gigiList.length > 0) {
-      participantFacilities.push(
-        createDentalFacility(
-          actualParticipantId - 1,
-          randomItem(gigiList).id,
-          treatmentClass
-        )
-      );
-      // Fix the participantId to use the actual ID
-      participantFacilities.at(-1)!.participantId = actualParticipantId;
+      const facilityData = createDentalFacility(
+        actualParticipantId - 1,
+        randomItem(gigiList).id,
+        treatmentClass
+      ) as Record<string, unknown>;
+      delete facilityData.id;
+      facilityData.participantId = actualParticipantId;
+      participantFacilities.push(facilityData);
     }
   }
 
-  await db.insert(employmentIdentity).values(employmentIdentities);
-  await db.insert(familyMember).values(familyMembers);
-  await db.insert(bankInformation).values(banks);
-  await db.insert(participantHealthcareFacility).values(participantFacilities);
+  await db.insert(employmentIdentity).values(employmentIdentities as any);
+  await db.insert(familyMember).values(familyMembers as any);
+  await db.insert(bankInformation).values(banks as any);
+  await db
+    .insert(participantHealthcareFacility)
+    .values(participantFacilities as any);
 
   console.log(`✓ Seeded ${count} participants`);
   console.log(`  - ${employmentIdentities.length} employment identities`);
