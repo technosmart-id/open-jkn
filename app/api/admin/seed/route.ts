@@ -69,6 +69,20 @@ async function runMigrations() {
   } catch (error: any) {
     const errorMsg = error.stderr || error.stdout || error.message || error;
     console.error("Error pushing schema:", errorMsg);
+
+    // Check if it's a DNS/DATABASE_URL error
+    if (
+      errorMsg.includes("ENOTFOUND") ||
+      errorMsg.includes("DNS") ||
+      errorMsg.includes("getaddrinfo")
+    ) {
+      throw new Error(
+        "DATABASE_URL connection failed. The database hostname cannot be resolved.\n" +
+          "Your DATABASE_URL likely points to 'openjkn-db' which only works in docker-compose locally.\n" +
+          "Fix: Update your Dokploy DATABASE_URL to point to a real database (Supabase, Neon, etc)."
+      );
+    }
+
     throw new Error(`Failed to push schema: ${errorMsg}`);
   }
 }
