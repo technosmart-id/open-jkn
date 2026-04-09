@@ -51,6 +51,7 @@ RUN useradd --system --uid 1001 --gid nodejs -m nextjs
 ENV MPLCONFIGDIR=/tmp/matplotlib-cache
 ENV TF_ENABLE_ONEDNN_OPTS=0
 ENV CUDA_VISIBLE_DEVICES=-1
+ENV TF_CPP_MIN_LOG_LEVEL=3
 
 # Copy necessary files
 COPY --from=builder /app/public ./public
