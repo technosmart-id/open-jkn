@@ -14,6 +14,32 @@ import {
 } from "@/lib/seeders";
 
 async function runMigrations() {
+  const { pool } = await import("@/lib/db");
+
+  // Drop all JKN tables first to ensure clean state
+  const tablesToDrop = [
+    "contribution_payment",
+    "data_change_request",
+    "registration_application",
+    "bank_information",
+    "family_member",
+    "employment_identity",
+    "participant_healthcare_facility",
+    "dental_facility",
+    "healthcare_facility",
+    "participant",
+  ];
+
+  for (const table of tablesToDrop) {
+    try {
+      await pool.query(`DROP TABLE IF EXISTS "${table}" CASCADE`);
+      console.log(`✓ Dropped table ${table}`);
+    } catch (error: unknown) {
+      console.log(`  ⊗ Table ${table} doesn't exist or error dropping`);
+    }
+  }
+
+  // Run migrations in order
   const sqlFiles = [
     "lib/db/migrations/create_jkn_tables.sql",
     "lib/db/migrations/0001_fix_jkn_tables.sql",
@@ -23,17 +49,11 @@ async function runMigrations() {
   for (const file of sqlFiles) {
     try {
       const sqlContent = readFileSync(join(process.cwd(), file), "utf-8");
-      // Use pool directly to execute raw SQL
-      const { pool } = await import("@/lib/db");
       await pool.query(sqlContent);
       console.log(`✓ Executed ${file}`);
     } catch (error: unknown) {
       const errMsg = error instanceof Error ? error.message : String(error);
-      if (errMsg.includes("already exists")) {
-        console.log(`⊗ ${file} - tables already exist`);
-      } else {
-        console.error(`Error executing ${file}:`, errMsg);
-      }
+      console.error(`Error executing ${file}:`, errMsg);
     }
   }
 }
@@ -47,7 +67,9 @@ export async function POST(request: Request) {
 
     switch (action) {
       case "all":
+        // Drop tables and re-run migrations
         await runMigrations();
+        // Seed all data (seedAll calls clearAllData which is now redundant but safe)
         await seedAll();
         result.message = "Database seeded successfully with all data";
         result.stats = {
