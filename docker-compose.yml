@@ -11,6 +11,7 @@ services:
         - NEXT_PUBLIC_BETTER_AUTH_URL=https://open-jkn.technosmart.id
         - NEXT_PUBLIC_APP_URL=https://open-jkn.technosmart.id
         - RESEND_API_KEY=
+        - OPENIMIS_DATABASE_URL=
     # Remove port mapping - Dokploy handles reverse proxying
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@openjkn-db:5432/openjkn
@@ -18,6 +19,8 @@ services:
       - BETTER_AUTH_SECRET=temp-secret-change-in-production
       - NEXT_PUBLIC_BETTER_AUTH_URL=https://open-jkn.technosmart.id
       - NEXT_PUBLIC_APP_URL=https://open-jkn.technosmart.id
+      - RESEND_API_KEY=
+      - OPENIMIS_DATABASE_URL=
     depends_on:
       openjkn-db:
         condition: service_healthy
