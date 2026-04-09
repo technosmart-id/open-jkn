@@ -1,6 +1,6 @@
-import { exec } from "child_process";
+import { readFileSync } from "fs";
 import { NextResponse } from "next/server";
-import { promisify } from "util";
+import { join } from "path";
 import {
   clearAllData,
   seedAdminUser,
@@ -13,77 +13,28 @@ import {
   seedRegistrations,
 } from "@/lib/seeders";
 
-const execAsync = promisify(exec);
-
 async function runMigrations() {
-  const { pool } = await import("@/lib/db");
-
-  // Drop all JKN tables first to ensure clean state
-  const tablesToDrop = [
-    "contribution_payment",
-    "data_change_request",
-    "registration_application",
-    "bank_information",
-    "family_member",
-    "employment_identity",
-    "participant_healthcare_facility",
-    "dental_facility",
-    "healthcare_facility",
-    "participant",
+  const sqlFiles = [
+    "lib/db/migrations/create_jkn_tables.sql",
+    "lib/db/migrations/0001_fix_jkn_tables.sql",
+    "lib/db/migrations/0002_split_fullname_into_first_last_name.sql",
   ];
 
-  for (const table of tablesToDrop) {
+  for (const file of sqlFiles) {
     try {
-      await pool.query(`DROP TABLE IF EXISTS "${table}" CASCADE`);
-      console.log(`✓ Dropped table ${table}`);
-    } catch {
-      // Ignore errors
+      const sqlContent = readFileSync(join(process.cwd(), file), "utf-8");
+      // Use pool directly to execute raw SQL
+      const { pool } = await import("@/lib/db");
+      await pool.query(sqlContent);
+      console.log(`✓ Executed ${file}`);
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      if (errMsg.includes("already exists")) {
+        console.log(`⊗ ${file} - tables already exist`);
+      } else {
+        console.error(`Error executing ${file}:`, errMsg);
+      }
     }
-  }
-
-  // Use drizzle-kit push to create tables with correct schema
-  // Pass environment variables to ensure DATABASE_URL is available
-  const env = {
-    ...process.env,
-    DATABASE_URL: process.env.DATABASE_URL,
-  };
-
-  try {
-    const { stdout, stderr } = await execAsync("bun run db:push", {
-      cwd: process.cwd(),
-      env,
-      timeout: 60_000,
-    });
-
-    // Check if there were errors in stderr
-    if (
-      stderr &&
-      (stderr.includes("error") ||
-        stderr.includes("ENOTFOUND") ||
-        stderr.includes("DNS"))
-    ) {
-      throw new Error(`db:push failed: ${stderr}`);
-    }
-
-    console.log("✓ Schema pushed successfully");
-  } catch (error: any) {
-    const errorMsg = error.stderr || error.stdout || error.message || error;
-    console.error("Error pushing schema:", errorMsg);
-
-    // Check if it's a DNS/DATABASE_URL error
-    if (
-      errorMsg.includes("ENOTFOUND") ||
-      errorMsg.includes("DNS") ||
-      errorMsg.includes("getaddrinfo")
-    ) {
-      throw new Error(
-        "DATABASE_URL connection failed. The database hostname cannot be resolved.\n" +
-          "Your DATABASE_URL likely points to 'openjkn-db' which only works in docker-compose locally.\n" +
-          "Fix: Update your Dokploy DATABASE_URL to point to a real database (Supabase, Neon, etc)."
-      );
-    }
-
-    throw new Error(`Failed to push schema: ${errorMsg}`);
   }
 }
 
@@ -96,9 +47,7 @@ export async function POST(request: Request) {
 
     switch (action) {
       case "all":
-        // Drop tables and re-run migrations
         await runMigrations();
-        // Seed all data (seedAll calls clearAllData which is now redundant but safe)
         await seedAll();
         result.message = "Database seeded successfully with all data";
         result.stats = {
