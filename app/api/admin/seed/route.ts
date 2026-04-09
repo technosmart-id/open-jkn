@@ -54,14 +54,22 @@ async function runMigrations() {
       env,
       timeout: 60_000,
     });
+
+    // Check if there were errors in stderr
+    if (
+      stderr &&
+      (stderr.includes("error") ||
+        stderr.includes("ENOTFOUND") ||
+        stderr.includes("DNS"))
+    ) {
+      throw new Error(`db:push failed: ${stderr}`);
+    }
+
     console.log("✓ Schema pushed successfully");
-    if (stdout) console.log(stdout);
-    if (stderr) console.error(stderr);
   } catch (error: any) {
-    console.error("Error pushing schema:", error.message || error);
-    if (error.stdout) console.log("stdout:", error.stdout);
-    if (error.stderr) console.error("stderr:", error.stderr);
-    throw new Error(`Failed to push schema: ${error.message || error}`);
+    const errorMsg = error.stderr || error.stdout || error.message || error;
+    console.error("Error pushing schema:", errorMsg);
+    throw new Error(`Failed to push schema: ${errorMsg}`);
   }
 }
 
