@@ -171,28 +171,36 @@ function createFamilyMember(
   const nameParts = fullName.split(" ");
   const isStudent = isChild && randomBoolean();
 
+  // Format date as string for database timestamp column
+  const birthDate = faker.date.birthdate({ mode: "age", min: 1, max: 25 });
+  const studentVerificationDate = isStudent
+    ? new Date(new Date().getFullYear() - 1, 0, 1)
+    : null;
+
   return {
     headOfFamilyId: participantIndex + 1,
     firstName: nameParts[0] || "",
     lastName: nameParts.slice(1).join(" ") || null,
     identityNumber: faker.string.numeric(16),
     relationship: isChild ? "ANAK_TANGGUNGAN" : "ISTRI",
-    pisaCode: (isChild ? "4" : "2") as "1" | "2" | "3" | "4" | "5", // 4: Anak, 2: Istri
+    pisaCode: (isChild ? "4" : "2") as "1" | "2" | "3" | "4" | "5",
     childOrder: isChild ? faker.number.int({ min: 1, max: 5 }) : null,
     isStudent,
     gender: faker.person.sex() === "female" ? "PEREMPUAN" : "LAKI_LAKI",
     birthPlace: city,
-    birthDate: faker.date.birthdate({ mode: "age", min: 1, max: 25 }),
+    birthDate,
     phoneNumber: faker.phone.number() || null,
     email: faker.internet.email() || null,
     bpjsNumber: null,
     employeeId: null,
     studentVerificationNumber: isStudent ? faker.string.alphanumeric(10) : null,
-    studentVerificationDate: isStudent ? new Date() : null,
+    studentVerificationDate,
     photoUrl: null,
     primaryFacilityId: null,
     dentalFacilityId: null,
     hasCommercialInsurance: false,
+    commercialInsurancePolicyNumber: null,
+    commercialInsuranceCompanyName: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -251,6 +259,15 @@ function createParticipantData(
   const street = faker.location.streetAddress();
   const fullName = faker.person.fullName();
   const nameParts = fullName.split(" ");
+  const birthDate = faker.date.birthdate({ mode: "age", min: 18, max: 80 });
+
+  // Format date as YYYY-MM-DD for database date column
+  const formatDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   return {
     bpjsNumber: `${String(index + 1).padStart(13, "0")}`,
@@ -259,15 +276,33 @@ function createParticipantData(
     firstName: nameParts[0] || "",
     lastName: nameParts.slice(1).join(" ") || null,
     nameOnCard: fullName,
-    pisaCode: "1", // Default to Peserta
+    pisaCode: "1" as "1" | "2" | "3" | "4" | "5", // Default to Peserta
     gender: faker.person.sex() === "female" ? "PEREMPUAN" : "LAKI_LAKI",
-    bloodType: "O",
+    bloodType: "O" as
+      | "A"
+      | "B"
+      | "AB"
+      | "O"
+      | "A_POSITIVE"
+      | "B_POSITIVE"
+      | "AB_POSITIVE"
+      | "O_POSITIVE"
+      | "A_NEGATIVE"
+      | "B_NEGATIVE"
+      | "AB_NEGATIVE"
+      | "O_NEGATIVE"
+      | "UNKNOWN",
     birthPlace: city,
-    birthDate: faker.date
-      .birthdate({ mode: "age", min: 18, max: 80 })
-      .toISOString(),
-    religion: "ISLAM",
-    maritalStatus: "KAWIN",
+    birthDate: formatDate(birthDate) as any, // Date string in YYYY-MM-DD format
+    religion: "ISLAM" as
+      | "ISLAM"
+      | "KRISTEN"
+      | "KATOLIK"
+      | "HINDU"
+      | "BUDHA"
+      | "KONGHUCU"
+      | "LAINNYA",
+    maritalStatus: "KAWIN" as "KAWIN" | "BELUM_KAWIN" | "JANDA" | "DUDA",
     phoneNumber: faker.phone.number(),
     email: faker.internet.email(),
     addressStreet: street,
@@ -285,7 +320,10 @@ function createParticipantData(
     monthlyIncome: faker.number
       .int({ min: 3_000_000, max: 15_000_000 })
       .toString(),
+    visaNumber: null,
     hasCommercialInsurance: false,
+    commercialInsurancePolicyNumber: null,
+    commercialInsuranceCompanyName: null,
     isLifetimeMember: true,
     participantSegment: segment,
     treatmentClass: randomItem(TREATMENT_CLASSES),
