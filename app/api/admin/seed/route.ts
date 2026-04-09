@@ -1,6 +1,6 @@
-import fs from "node:fs";
-import path from "node:path";
+import { readFileSync } from "fs";
 import { NextResponse } from "next/server";
+import { join } from "path";
 import {
   clearAllData,
   seedAdminUser,
@@ -13,44 +13,27 @@ import {
   seedRegistrations,
 } from "@/lib/seeders";
 
-function generateDrizzleConfig() {
-  // Regenerate drizzle.config.json with current runtime DATABASE_URL
-  const config = {
-    schema: ["./lib/db/schema/auth.ts", "./lib/db/schema/jkn/index.ts"],
-    out: "./lib/db/migrations",
-    dialect: "postgresql",
-    dbCredentials: {
-      url: process.env.DATABASE_URL,
-    },
-  };
-
-  const configPath = path.join(process.cwd(), "drizzle.config.json");
-  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
-  console.log("✓ Generated drizzle.config.json with runtime DATABASE_URL");
-}
-
 async function runMigrations() {
-  // First regenerate config with current DATABASE_URL
-  generateDrizzleConfig();
+  const sqlFiles = [
+    "lib/db/migrations/create_jkn_tables.sql",
+    "lib/db/migrations/0001_fix_jkn_tables.sql",
+  ];
 
-  // Use drizzle-kit push to sync schema (simpler than migrate for this use case)
-  const { execSync } = await import("child_process");
-
-  try {
-    const output = execSync("bun run db:push", {
-      stdio: "pipe",
-      cwd: process.cwd(),
-      env: { ...process.env },
-    });
-    console.log("✓ Schema synced successfully");
-    if (output) {
-      console.log(output.toString());
+  for (const file of sqlFiles) {
+    try {
+      const sqlContent = readFileSync(join(process.cwd(), file), "utf-8");
+      // Use pool directly to execute raw SQL
+      const { pool } = await import("@/lib/db");
+      await pool.query(sqlContent);
+      console.log(`✓ Executed ${file}`);
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      if (errMsg.includes("already exists")) {
+        console.log(`⊗ ${file} - tables already exist`);
+      } else {
+        console.error(`Error executing ${file}:`, errMsg);
+      }
     }
-  } catch (error: any) {
-    const stdout = error.stdout?.toString() || "";
-    const stderr = error.stderr?.toString() || "";
-    console.error("Schema sync error:", stdout || stderr);
-    throw new Error(`Failed to sync schema: ${stdout || stderr}`);
   }
 }
 
