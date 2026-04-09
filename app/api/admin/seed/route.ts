@@ -1,6 +1,6 @@
-import { readFileSync } from "fs";
+import { exec } from "child_process";
 import { NextResponse } from "next/server";
-import { join } from "path";
+import { promisify } from "util";
 import {
   clearAllData,
   seedAdminUser,
@@ -12,6 +12,8 @@ import {
   seedPayments,
   seedRegistrations,
 } from "@/lib/seeders";
+
+const execAsync = promisify(exec);
 
 async function runMigrations() {
   const { pool } = await import("@/lib/db");
@@ -34,27 +36,18 @@ async function runMigrations() {
     try {
       await pool.query(`DROP TABLE IF EXISTS "${table}" CASCADE`);
       console.log(`✓ Dropped table ${table}`);
-    } catch (error: unknown) {
-      console.log(`  ⊗ Table ${table} doesn't exist or error dropping`);
+    } catch {
+      // Ignore errors
     }
   }
 
-  // Run migrations in order
-  const sqlFiles = [
-    "lib/db/migrations/create_jkn_tables.sql",
-    "lib/db/migrations/0001_fix_jkn_tables.sql",
-    "lib/db/migrations/0002_split_fullname_into_first_last_name.sql",
-  ];
-
-  for (const file of sqlFiles) {
-    try {
-      const sqlContent = readFileSync(join(process.cwd(), file), "utf-8");
-      await pool.query(sqlContent);
-      console.log(`✓ Executed ${file}`);
-    } catch (error: unknown) {
-      const errMsg = error instanceof Error ? error.message : String(error);
-      console.error(`Error executing ${file}:`, errMsg);
-    }
+  // Use drizzle-kit push to create tables with correct schema
+  try {
+    await execAsync("bun run db:push", { cwd: process.cwd() });
+    console.log("✓ Schema pushed successfully");
+  } catch (error) {
+    console.error("Error pushing schema:", error);
+    throw error;
   }
 }
 
