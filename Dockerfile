@@ -8,7 +8,7 @@ FROM base AS builder
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
 # Build arguments for environment variables
-ARG DATABASE_URL
+# NOTE: DATABASE_URL is NOT needed at build time, only at runtime
 ARG BETTER_AUTH_URL
 ARG BETTER_AUTH_SECRET
 ARG NEXT_PUBLIC_BETTER_AUTH_URL
@@ -16,7 +16,6 @@ ARG NEXT_PUBLIC_APP_URL
 ARG RESEND_API_KEY
 
 # Set environment variables for build time
-ENV DATABASE_URL=${DATABASE_URL}
 ENV BETTER_AUTH_URL=${BETTER_AUTH_URL}
 ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
 ENV NEXT_PUBLIC_BETTER_AUTH_URL=${NEXT_PUBLIC_BETTER_AUTH_URL}
