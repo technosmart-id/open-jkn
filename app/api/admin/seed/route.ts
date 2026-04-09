@@ -42,12 +42,26 @@ async function runMigrations() {
   }
 
   // Use drizzle-kit push to create tables with correct schema
+  // Pass environment variables to ensure DATABASE_URL is available
+  const env = {
+    ...process.env,
+    DATABASE_URL: process.env.DATABASE_URL,
+  };
+
   try {
-    await execAsync("bun run db:push", { cwd: process.cwd() });
+    const { stdout, stderr } = await execAsync("bun run db:push", {
+      cwd: process.cwd(),
+      env,
+      timeout: 60_000,
+    });
     console.log("✓ Schema pushed successfully");
-  } catch (error) {
-    console.error("Error pushing schema:", error);
-    throw error;
+    if (stdout) console.log(stdout);
+    if (stderr) console.error(stderr);
+  } catch (error: any) {
+    console.error("Error pushing schema:", error.message || error);
+    if (error.stdout) console.log("stdout:", error.stdout);
+    if (error.stderr) console.error("stderr:", error.stderr);
+    throw new Error(`Failed to push schema: ${error.message || error}`);
   }
 }
 
