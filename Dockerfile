@@ -55,10 +55,9 @@ COPY --from=builder /app/drizzle.config.json ./drizzle.config.json
 # Copy migration files and schema
 COPY --from=builder /app/lib/db ./lib/db
 
-# Make drizzle.config.json and migrations meta directory writable for runtime
-RUN chown -R nextjs:nodejs /app/drizzle.config.json /app/lib/db/migrations && \
-    chmod -R 664 /app/drizzle.config.json /app/lib/db/migrations/*.sql 2>/dev/null || true && \
-    chmod 775 /app/lib/db/migrations/meta 2>/dev/null || mkdir -p /app/lib/db/migrations/meta && chown -R nextjs:nodejs /app/lib/db/migrations/meta
+# Make drizzle.config.json writable for runtime regeneration
+RUN chown nextjs:nodejs /app/drizzle.config.json && \
+    chmod 664 /app/drizzle.config.json
 
 # Create uploads directory with proper permissions
 RUN mkdir -p /app/uploads && chown -R nextjs:nodejs /app/uploads
