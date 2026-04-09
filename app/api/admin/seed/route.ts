@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { NextResponse } from "next/server";
 import {
   clearAllData,
@@ -11,20 +13,48 @@ import {
   seedRegistrations,
 } from "@/lib/seeders";
 
+function generateDrizzleConfig() {
+  // Regenerate drizzle.config.json with current runtime DATABASE_URL
+  const config = {
+    schema: [
+      "./lib/db/schema/auth.ts",
+      "./lib/db/schema/index.ts",
+      "./lib/db/schema/pbb/index.ts",
+      "./lib/db/schema/jkn/index.ts",
+    ],
+    out: "./lib/db/migrations",
+    dialect: "postgresql",
+    dbCredentials: {
+      url: process.env.DATABASE_URL,
+    },
+  };
+
+  const configPath = path.join(process.cwd(), "drizzle.config.json");
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+  console.log("✓ Generated drizzle.config.json with runtime DATABASE_URL");
+}
+
 async function runMigrations() {
+  // First regenerate config with current DATABASE_URL
+  generateDrizzleConfig();
+
   // Use drizzle-kit push to create/ensure schema
   const { execSync } = await import("child_process");
 
   try {
-    execSync("bun run db:push", {
+    const output = execSync("bun run db:push", {
       stdio: "pipe",
       cwd: process.cwd(),
     });
     console.log("✓ Schema synced successfully");
+    if (output) {
+      console.log(output.toString());
+    }
   } catch (error: any) {
+    const stdout = error.stdout?.toString() || "";
     const stderr = error.stderr?.toString() || "";
-    console.error("Schema sync error:", stderr);
-    // Don't throw - try to continue and let the actual seed fail if needed
+    console.error("Schema sync error:", stdout || stderr);
+    throw new Error(`Failed to sync schema: ${stdout || stderr}`);
   }
 }
 
