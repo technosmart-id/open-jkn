@@ -43,9 +43,14 @@ ENV NODE_ENV=production
 # Install Python for AI features
 RUN apt-get update && apt-get install -y python3 python3-pip python3-venv && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
+# Create non-root user with home directory
 RUN groupadd --system --gid 1001 nodejs
-RUN useradd --system --uid 1001 --gid nodejs nextjs
+RUN useradd --system --uid 1001 --gid nodejs -m nextjs
+
+# Set environment variables for Matplotlib and TensorFlow
+ENV MPLCONFIGDIR=/tmp/matplotlib-cache
+ENV TF_ENABLE_ONEDNN_OPTS=0
+ENV CUDA_VISIBLE_DEVICES=-1
 
 # Copy necessary files
 COPY --from=builder /app/public ./public
@@ -67,15 +72,14 @@ COPY --from=builder /app/ai ./ai
 # Use --break-system-packages to work with PEP 668 in Python 3.13+
 RUN pip3 install --break-system-packages --no-cache-dir -r /app/ai/requirements.txt
 
-# Make drizzle.config.json writable for runtime regeneration
-RUN chown nextjs:nodejs /app/drizzle.config.json && \
+# Create necessary directories and set permissions
+RUN mkdir -p /tmp/matplotlib-cache && chown -R nextjs:nodejs /tmp/matplotlib-cache && \
+    mkdir -p /app/ai/anomaly_detection/saved_models && chown -R nextjs:nodejs /app/ai/anomaly_detection/saved_models && \
+    mkdir -p /app/ai/outputs_enrollment && chown -R nextjs:nodejs /app/ai/outputs_enrollment && \
+    mkdir -p /app/uploads && chown -R nextjs:nodejs /app/uploads && \
+    mkdir -p /tmp/openjkn-ai && chown -R nextjs:nodejs /tmp/openjkn-ai && \
+    chown nextjs:nodejs /app/drizzle.config.json && \
     chmod 664 /app/drizzle.config.json
-
-# Create uploads directory with proper permissions
-RUN mkdir -p /app/uploads && chown -R nextjs:nodejs /app/uploads
-
-# Create AI temp directory with proper permissions
-RUN mkdir -p /tmp/openjkn-ai && chown -R nextjs:nodejs /tmp/openjkn-ai
 
 # Copy migration script
 COPY --chmod=755 scripts/docker-entrypoint.sh /app/docker-entrypoint.sh

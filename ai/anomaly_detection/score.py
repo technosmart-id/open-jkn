@@ -4,6 +4,7 @@ This is what the backend team will call.
 """
 
 import os
+import sys
 import numpy as np
 import pandas as pd
 import joblib
@@ -18,18 +19,26 @@ from .rules import apply_rules
 
 def load_artifacts() -> dict:
     """Load all saved model artifacts from disk."""
+    required_files = {
+        "autoencoder": os.path.join(config.MODEL_DIR, "autoencoder.keras"),
+        "iso_forest": os.path.join(config.MODEL_DIR, "isolation_forest.joblib"),
+        "scaler": os.path.join(config.MODEL_DIR, "scaler.joblib"),
+        "feature_names": os.path.join(config.MODEL_DIR, "feature_names.joblib"),
+        "threshold": os.path.join(config.MODEL_DIR, "threshold.joblib"),
+    }
+
+    missing = [f for f, p in required_files.items() if not os.path.exists(p)]
+    if missing:
+        print(f"ERROR: Missing model artifacts: {', '.join(missing)}")
+        print(f"Please run 'python ai/run_train.py' first to train the models.")
+        sys.exit(1)
+
     artifacts = {
-        "autoencoder": load_model(
-            os.path.join(config.MODEL_DIR, "autoencoder.keras")
-        ),
-        "iso_forest": joblib.load(
-            os.path.join(config.MODEL_DIR, "isolation_forest.joblib")
-        ),
-        "scaler": joblib.load(os.path.join(config.MODEL_DIR, "scaler.joblib")),
-        "feature_names": joblib.load(
-            os.path.join(config.MODEL_DIR, "feature_names.joblib")
-        ),
-        "threshold": joblib.load(os.path.join(config.MODEL_DIR, "threshold.joblib")),
+        "autoencoder": load_model(required_files["autoencoder"]),
+        "iso_forest": joblib.load(required_files["iso_forest"]),
+        "scaler": joblib.load(required_files["scaler"]),
+        "feature_names": joblib.load(required_files["feature_names"]),
+        "threshold": joblib.load(required_files["threshold"]),
     }
     print(f"Loaded models from {config.MODEL_DIR}/")
     return artifacts
