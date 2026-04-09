@@ -1,6 +1,4 @@
-import { readFileSync } from "fs";
 import { NextResponse } from "next/server";
-import { join } from "path";
 import {
   clearAllData,
   seedAdminUser,
@@ -14,27 +12,19 @@ import {
 } from "@/lib/seeders";
 
 async function runMigrations() {
-  const sqlFiles = [
-    "lib/db/migrations/create_jkn_tables.sql",
-    "lib/db/migrations/0001_fix_jkn_tables.sql",
-    "lib/db/migrations/0002_split_fullname_into_first_last_name.sql",
-  ];
+  // Use drizzle-kit push to create/ensure schema
+  const { execSync } = await import("child_process");
 
-  for (const file of sqlFiles) {
-    try {
-      const sqlContent = readFileSync(join(process.cwd(), file), "utf-8");
-      // Use pool directly to execute raw SQL
-      const { pool } = await import("@/lib/db");
-      await pool.query(sqlContent);
-      console.log(`✓ Executed ${file}`);
-    } catch (error: unknown) {
-      const errMsg = error instanceof Error ? error.message : String(error);
-      if (errMsg.includes("already exists")) {
-        console.log(`⊗ ${file} - tables already exist`);
-      } else {
-        console.error(`Error executing ${file}:`, errMsg);
-      }
-    }
+  try {
+    execSync("bun run db:push", {
+      stdio: "pipe",
+      cwd: process.cwd(),
+    });
+    console.log("✓ Schema synced successfully");
+  } catch (error: any) {
+    const stderr = error.stderr?.toString() || "";
+    console.error("Schema sync error:", stderr);
+    // Don't throw - try to continue and let the actual seed fail if needed
   }
 }
 
