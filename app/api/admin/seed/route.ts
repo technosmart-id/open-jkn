@@ -33,23 +33,23 @@ async function runMigrations() {
   // First regenerate config with current DATABASE_URL
   generateDrizzleConfig();
 
-  // Use drizzle-kit push to create/ensure schema
+  // Use drizzle-kit migrate to run migration files
   const { execSync } = await import("child_process");
 
   try {
-    const output = execSync("bun run db:push", {
+    const output = execSync("bun run db:migrate", {
       stdio: "pipe",
       cwd: process.cwd(),
     });
-    console.log("✓ Schema synced successfully");
+    console.log("✓ Migrations applied successfully");
     if (output) {
       console.log(output.toString());
     }
   } catch (error: any) {
     const stdout = error.stdout?.toString() || "";
     const stderr = error.stderr?.toString() || "";
-    console.error("Schema sync error:", stdout || stderr);
-    throw new Error(`Failed to sync schema: ${stdout || stderr}`);
+    console.error("Migration error:", stdout || stderr);
+    throw new Error(`Failed to apply migrations: ${stdout || stderr}`);
   }
 }
 
