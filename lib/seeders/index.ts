@@ -142,7 +142,7 @@ function createEmploymentIdentity(
     salaryPayerInstitutionCode: `PAY${String(index + 1).padStart(4, "0")}`,
     oldEmployeeId: `OLD${String(index + 1).padStart(8, "0")}`,
     newEmployeeId: `EMP${String(index + 1).padStart(6, "0")}`,
-    grade: randomItem(["I", "II", "III", "IV"] as const),
+    grade: "I" as "I" | "II" | "III" | "IV" | "A" | "B" | "C" | "D" | "E",
     rank: faker.person.jobTitle(),
     baseSalary: faker.number
       .int({ min: 3_000_000, max: 15_000_000 })
@@ -150,7 +150,7 @@ function createEmploymentIdentity(
     employmentStartDate: randomDate(new Date(2020, 0, 1), new Date()),
     gradeStartDate: randomDate(new Date(2020, 0, 1), new Date()),
     position: faker.person.jobTitle(),
-    employeeStatus: "TETAP",
+    employeeStatus: "TETAP" as "TETAP" | "KONTRAK" | "PARUH_WAKTU",
     companyAddress: faker.location.streetAddress(),
     companyVillage: city,
     companyDistrict: faker.location.county(),
@@ -170,14 +170,12 @@ function createFamilyMember(
   const fullName = faker.person.fullName();
   const nameParts = fullName.split(" ");
   const isStudent = isChild && randomBoolean();
-
-  // Format date as string for database timestamp column
   const birthDate = faker.date.birthdate({ mode: "age", min: 1, max: 25 });
   const studentVerificationDate = isStudent
     ? new Date(new Date().getFullYear() - 1, 0, 1)
     : null;
 
-  return {
+  const data: ReturnType<typeof createFamilyMember> = {
     headOfFamilyId: participantIndex + 1,
     firstName: nameParts[0] || "",
     lastName: nameParts.slice(1).join(" ") || null,
@@ -199,21 +197,35 @@ function createFamilyMember(
     primaryFacilityId: null,
     dentalFacilityId: null,
     hasCommercialInsurance: false,
-    commercialInsurancePolicyNumber: null,
-    commercialInsuranceCompanyName: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
+
+  return data;
 }
 
 function createBankAccount(index: number): typeof bankInformation.$inferInsert {
   return {
     participantId: index + 1,
-    bankName: randomItem(BANKS),
+    bankName: randomItem(BANKS) as
+      | "MANDIRI"
+      | "BRI"
+      | "BNI"
+      | "BCA"
+      | "BCA_SYARIAH"
+      | "BRI_SYARIAH"
+      | "BNI_SYARIAH"
+      | "BTN"
+      | "JATENG"
+      | "JATIM"
+      | "JB"
+      | "SUMUT"
+      | "LAINNYA",
     accountNumber: faker.finance.accountNumber(10),
     accountHolderName: faker.person.fullName(),
     autoDebitAuthorized: randomBoolean(),
     virtualAccountNumber: `VA${String(index + 1).padStart(12, "0")}`,
+    autoDebitDocumentUrl: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -269,40 +281,19 @@ function createParticipantData(
     return `${year}-${month}-${day}`;
   };
 
-  return {
+  const data: ReturnType<typeof createParticipantData> = {
     bpjsNumber: `${String(index + 1).padStart(13, "0")}`,
     familyCardNumber: faker.string.numeric(16),
     identityNumber: faker.string.numeric(16),
     firstName: nameParts[0] || "",
     lastName: nameParts.slice(1).join(" ") || null,
     nameOnCard: fullName,
-    pisaCode: "1" as "1" | "2" | "3" | "4" | "5", // Default to Peserta
     gender: faker.person.sex() === "female" ? "PEREMPUAN" : "LAKI_LAKI",
-    bloodType: "O" as
-      | "A"
-      | "B"
-      | "AB"
-      | "O"
-      | "A_POSITIVE"
-      | "B_POSITIVE"
-      | "AB_POSITIVE"
-      | "O_POSITIVE"
-      | "A_NEGATIVE"
-      | "B_NEGATIVE"
-      | "AB_NEGATIVE"
-      | "O_NEGATIVE"
-      | "UNKNOWN",
+    bloodType: "O",
     birthPlace: city,
-    birthDate: formatDate(birthDate) as any, // Date string in YYYY-MM-DD format
-    religion: "ISLAM" as
-      | "ISLAM"
-      | "KRISTEN"
-      | "KATOLIK"
-      | "HINDU"
-      | "BUDHA"
-      | "KONGHUCU"
-      | "LAINNYA",
-    maritalStatus: "KAWIN" as "KAWIN" | "BELUM_KAWIN" | "JANDA" | "DUDA",
+    birthDate: formatDate(birthDate) as any,
+    religion: "ISLAM",
+    maritalStatus: "KAWIN",
     phoneNumber: faker.phone.number(),
     email: faker.internet.email(),
     addressStreet: street,
@@ -315,28 +306,30 @@ function createParticipantData(
     addressPostalCode: faker.location.zipCode(),
     mailingAddressSame: true,
     npwp: faker.string.numeric(15),
-    photoUrl: null,
     occupation: faker.person.jobTitle(),
     monthlyIncome: faker.number
       .int({ min: 3_000_000, max: 15_000_000 })
       .toString(),
-    visaNumber: null,
-    hasCommercialInsurance: false,
-    commercialInsurancePolicyNumber: null,
-    commercialInsuranceCompanyName: null,
-    isLifetimeMember: true,
     participantSegment: segment,
     treatmentClass: randomItem(TREATMENT_CLASSES),
     isActive,
     statusPeserta: isActive ? "AKTIF" : "NON_AKTIF",
     statusBayar: "LUNAS",
-    deactivatedAt: isActive
-      ? null
-      : randomDate(new Date(2023, 0, 1), new Date()),
-    deactivationReason: isActive ? null : "Non-payment",
-    createdAt: randomDate(new Date(2023, 0, 1), new Date()),
-    updatedAt: new Date(),
+    isLifetimeMember: true,
+    hasCommercialInsurance: false,
   };
+
+  // Only add deactivated fields if inactive
+  if (!isActive) {
+    data.deactivatedAt = randomDate(new Date(2023, 0, 1), new Date());
+    data.deactivationReason = "Non-payment";
+  }
+
+  // Add timestamps last
+  data.createdAt = randomDate(new Date(2023, 0, 1), new Date());
+  data.updatedAt = new Date();
+
+  return data;
 }
 
 export async function seedParticipants(count = 50) {
