@@ -4,8 +4,8 @@ WORKDIR /app
 
 # Stage 2: Builder
 FROM base AS builder
-# Install git for lefthook (but we'll skip prepare scripts in Docker)
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+# Install git and python for AI features
+RUN apt-get update && apt-get install -y git python3 python3-pip python3-venv && rm -rf /var/lib/apt/lists/*
 
 # Build arguments for environment variables
 ARG DATABASE_URL
@@ -40,6 +40,9 @@ RUN bun run build
 FROM base AS runner
 ENV NODE_ENV=production
 
+# Install Python for AI features
+RUN apt-get update && apt-get install -y python3 python3-pip python3-venv && rm -rf /var/lib/apt/lists/*
+
 # Create non-root user
 RUN groupadd --system --gid 1001 nodejs
 RUN useradd --system --uid 1001 --gid nodejs nextjs
@@ -57,12 +60,21 @@ COPY --from=builder /app/drizzle.config.json ./drizzle.config.json
 # Copy migration files and schema
 COPY --from=builder /app/lib/db ./lib/db
 
+# Copy AI files for anomaly detection
+COPY --from=builder /app/ai ./ai
+
+# Install Python dependencies for AI features
+RUN pip3 install --no-cache-dir -r /app/ai/requirements.txt
+
 # Make drizzle.config.json writable for runtime regeneration
 RUN chown nextjs:nodejs /app/drizzle.config.json && \
     chmod 664 /app/drizzle.config.json
 
 # Create uploads directory with proper permissions
 RUN mkdir -p /app/uploads && chown -R nextjs:nodejs /app/uploads
+
+# Create AI temp directory with proper permissions
+RUN mkdir -p /tmp/openjkn-ai && chown -R nextjs:nodejs /tmp/openjkn-ai
 
 # Copy migration script
 COPY --chmod=755 scripts/docker-entrypoint.sh /app/docker-entrypoint.sh

@@ -306,7 +306,7 @@ function runPythonScript(
   dataPath: string
 ): Promise<string> {
   return new Promise((resolve, reject) => {
-    const python = spawn("python", [scriptPath, dataPath], {
+    const python = spawn("python3", [scriptPath, dataPath], {
       env: {
         ...process.env,
         OPENJKN_AI_OUTPUT_DIR: OUTPUT_DIR,
