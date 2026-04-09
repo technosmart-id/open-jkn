@@ -27,8 +27,24 @@ from anomaly_detection.evaluate import (
 
 def main():
     # ── Load ──
-    print("Loading data...")
-    df_raw = pd.read_stata(DATA_PATH)
+    if len(sys.argv) > 1:
+        data_path = sys.argv[1]
+    else:
+        data_path = DATA_PATH
+
+    print(f"Loading data from: {data_path}")
+    if not os.path.exists(data_path):
+        print(f"ERROR: Data file not found at {data_path}")
+        sys.exit(1)
+
+    if data_path.endswith(".dta"):
+        df_raw = pd.read_stata(data_path)
+    elif data_path.endswith(".csv"):
+        df_raw = pd.read_csv(data_path)
+    else:
+        print("Supported formats: .dta, .csv")
+        sys.exit(1)
+
     print(f"Loaded {len(df_raw):,} records\n")
 
     # ── Features ──

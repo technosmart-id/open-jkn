@@ -3,6 +3,7 @@
 import {
   AlertCircle,
   AlertTriangle,
+  Brain,
   CheckCircle2,
   Database,
   Download,
@@ -11,7 +12,7 @@ import {
   Loader2,
   Upload,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -53,6 +54,13 @@ interface AnalysisResponse {
   summary: AnalysisSummary;
   scoredData: AnalysisResult[] | null;
   anomalies: AnalysisResult[] | null;
+}
+
+interface ModelStatus {
+  modelsReady: boolean;
+  hasOutput: boolean;
+  canTrain: boolean;
+  canScore: boolean;
 }
 
 // Mock data for demonstration
@@ -113,13 +121,31 @@ export default function AnomaliPage() {
   const [file, setFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isAnalyzingDatabase, setIsAnalyzingDatabase] = useState(false);
+  const [isTraining, setIsTraining] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [modelStatus, setModelStatus] = useState<ModelStatus | null>(null);
   const [analysisResults, setAnalysisResults] = useState<{
     summary: AnalysisSummary | null;
     anomalies: AnalysisResult[];
   }>({ summary: null, anomalies: [] });
+
+  useEffect(() => {
+    fetchModelStatus();
+  }, []);
+
+  const fetchModelStatus = async () => {
+    try {
+      const response = await fetch("/api/ai/status");
+      if (response.ok) {
+        const data = await response.json();
+        setModelStatus(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch model status:", err);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -240,6 +266,60 @@ export default function AnomaliPage() {
     }
   };
 
+  const handleTrainModel = async () => {
+    setIsTraining(true);
+    setProgress(0);
+    setError(null);
+
+    // Simulate progress for training (usually takes longer)
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 95) {
+          clearInterval(interval);
+          return 95;
+        }
+        return prev + 5; // slower for training
+      });
+    }, 1000);
+
+    try {
+      const response = await fetch("/api/ai/train", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          isActive: true,
+          limit: 10_000, // smaller limit for UI-triggered training
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.details || "Gagal melakukan pelatihan model."
+        );
+      }
+
+      clearInterval(interval);
+      setProgress(100);
+
+      // Refresh status after training
+      await fetchModelStatus();
+
+      alert("Pelatihan model selesai! Brain AI sekarang sudah siap.");
+    } catch (err) {
+      clearInterval(interval);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Terjadi kesalahan saat melatih model."
+      );
+    } finally {
+      setIsTraining(false);
+    }
+  };
+
   const handleReset = () => {
     setFile(null);
     setAnalysisComplete(false);
@@ -282,32 +362,128 @@ export default function AnomaliPage() {
     ));
   };
 
-  const isProcessing = isAnalyzing || isAnalyzingDatabase;
+  const isProcessing = isAnalyzing || isAnalyzingDatabase || isTraining;
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <div>
-        <h1 className="font-bold text-2xl">Deteksi Anomali Kepesertaan</h1>
-        <p className="text-muted-foreground">
-          Analisis data kepesertaan BPJS untuk mendeteksi pola anomali
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-bold text-2xl">Deteksi Anomali Kepesertaan</h1>
+          <p className="text-muted-foreground">
+            Analisis data kepesertaan BPJS untuk mendeteksi pola anomali
+          </p>
+        </div>
+        <div className="flex gap-2">
+          {modelStatus && (
+            <Badge variant={modelStatus.modelsReady ? "default" : "secondary"}>
+              {modelStatus.modelsReady ? (
+                <CheckCircle2 className="mr-1 h-3 w-3" />
+              ) : (
+                <AlertCircle className="mr-1 h-3 w-3" />
+              )}
+              Model: {modelStatus.modelsReady ? "Siap" : "Belum Terlatih"}
+            </Badge>
+          )}
+        </div>
       </div>
 
       {/* Analysis Options */}
       <Card>
         <CardHeader>
-          <CardTitle>Pilih Sumber Data</CardTitle>
+          <CardTitle>Alur Kerja Deteksi Anomali</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* File Upload Option */}
+          <div className="grid gap-4 md:grid-cols-3">
+            {/* Step 1: Training */}
+            <div className="flex flex-col gap-3 rounded-lg border p-4">
+              <div className="flex items-center gap-2">
+                <Brain className="h-5 w-5 text-purple-600" />
+                <h3 className="font-semibold">Langkah 1: Pelatihan</h3>
+              </div>
+              <p className="text-muted-foreground text-sm">
+                Latih otak AI menggunakan data nyata dari database untuk
+                mengenali pola normal.
+              </p>
+              <div className="flex h-24 w-full items-center justify-center rounded-md border-2 border-dashed bg-muted/50">
+                <div className="text-center">
+                  <Brain
+                    className={`mx-auto mb-1 h-8 w-8 ${modelStatus?.modelsReady ? "text-green-600" : "text-purple-600"}`}
+                  />
+                  <p className="text-muted-foreground text-xs">
+                    {modelStatus?.modelsReady
+                      ? "Model Sudah Siap"
+                      : "Model Butuh Pelatihan"}
+                  </p>
+                </div>
+              </div>
+              <Button
+                className="w-full"
+                disabled={isProcessing}
+                onClick={handleTrainModel}
+                variant={modelStatus?.modelsReady ? "outline" : "default"}
+              >
+                {isTraining ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Melatih...
+                  </>
+                ) : (
+                  <>
+                    <Brain className="mr-2 h-4 w-4" />
+                    {modelStatus?.modelsReady
+                      ? "Latih Ulang Model"
+                      : "Latih Model Baru"}
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Step 2: Database Option */}
+            <div className="flex flex-col gap-3 rounded-lg border p-4">
+              <div className="flex items-center gap-2">
+                <Database className="h-5 w-5 text-blue-600" />
+                <h3 className="font-semibold">Langkah 2: Analisis DB</h3>
+              </div>
+              <p className="text-muted-foreground text-sm">
+                Analisis langsung data kepesertaan yang tersimpan di database
+                OpenJKN.
+              </p>
+              <div className="flex h-24 w-full items-center justify-center rounded-md border-2 border-dashed bg-muted/50">
+                <div className="text-center">
+                  <Database className="mx-auto mb-1 h-8 w-8 text-blue-600" />
+                  <p className="text-muted-foreground text-xs">
+                    Data Peserta &amp; Keluarga
+                  </p>
+                </div>
+              </div>
+              <Button
+                className="w-full"
+                disabled={isProcessing || !modelStatus?.modelsReady}
+                onClick={handleAnalyzeDatabase}
+                variant="default"
+              >
+                {isAnalyzingDatabase ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Menganalisis...
+                  </>
+                ) : (
+                  <>
+                    <Database className="mr-2 h-4 w-4" />
+                    Analisis Database
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Step 3: File Upload Option */}
             <div className="flex flex-col gap-3 rounded-lg border p-4">
               <div className="flex items-center gap-2">
                 <Upload className="h-5 w-5 text-muted-foreground" />
-                <h3 className="font-semibold">Upload File</h3>
+                <h3 className="font-semibold">Opsi: Analisis File</h3>
               </div>
               <p className="text-muted-foreground text-sm">
-                Upload file CSV atau DTA untuk analisis data kepesertaan.
+                Upload file CSV atau DTA dari sistem eksternal untuk analisis.
               </p>
               <label
                 className="flex h-24 w-full cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed bg-muted/50 transition-colors hover:bg-muted"
@@ -334,7 +510,7 @@ export default function AnomaliPage() {
                 <input
                   accept=".csv,.dta"
                   className="hidden"
-                  disabled={isProcessing}
+                  disabled={isProcessing || !modelStatus?.modelsReady}
                   id="file-upload"
                   onChange={handleFileChange}
                   type="file"
@@ -342,7 +518,7 @@ export default function AnomaliPage() {
               </label>
               <Button
                 className="w-full"
-                disabled={!file || isProcessing}
+                disabled={!file || isProcessing || !modelStatus?.modelsReady}
                 onClick={handleAnalyzeFile}
                 variant={file ? "default" : "outline"}
               >
@@ -359,51 +535,17 @@ export default function AnomaliPage() {
                 )}
               </Button>
             </div>
-
-            {/* Database Option */}
-            <div className="flex flex-col gap-3 rounded-lg border p-4">
-              <div className="flex items-center gap-2">
-                <Database className="h-5 w-5 text-muted-foreground" />
-                <h3 className="font-semibold">Database OpenJKN</h3>
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Analisis langsung data kepesertaan yang tersimpan di database
-                OpenJKN.
-              </p>
-              <div className="flex h-24 w-full items-center justify-center rounded-md border-2 border-dashed bg-muted/50">
-                <div className="text-center">
-                  <Database className="mx-auto mb-1 h-8 w-8 text-blue-600" />
-                  <p className="text-muted-foreground text-xs">
-                    Data Peserta &amp; Keluarga
-                  </p>
-                </div>
-              </div>
-              <Button
-                className="w-full"
-                disabled={isProcessing}
-                onClick={handleAnalyzeDatabase}
-                variant="default"
-              >
-                {isAnalyzingDatabase ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Menganalisis...
-                  </>
-                ) : (
-                  <>
-                    <Database className="mr-2 h-4 w-4" />
-                    Analisis Database
-                  </>
-                )}
-              </Button>
-            </div>
           </div>
 
           {isProcessing && (
             <div className="mt-4">
               <div className="mb-2 flex justify-between text-sm">
                 <span>
-                  {isAnalyzing ? "Memproses file..." : "Mengquery database..."}
+                  {isAnalyzing
+                    ? "Memproses file..."
+                    : isAnalyzingDatabase
+                      ? "Mengquery database..."
+                      : "Melatih model AI (mungkin memakan waktu beberapa menit)..."}
                 </span>
                 <span>{progress}%</span>
               </div>
