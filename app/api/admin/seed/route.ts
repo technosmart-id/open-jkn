@@ -17,6 +17,7 @@ async function runMigrations() {
   const sqlFiles = [
     "lib/db/migrations/create_jkn_tables.sql",
     "lib/db/migrations/0001_fix_jkn_tables.sql",
+    "lib/db/migrations/0002_split_fullname_into_first_last_name.sql",
   ];
 
   for (const file of sqlFiles) {
