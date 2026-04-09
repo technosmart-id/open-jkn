@@ -90,10 +90,13 @@ export async function queryParticipantsForML(
     return tempFilePath;
   } catch (queryError) {
     console.error("[Database Query Error]:", queryError);
-    // Fallback: simple query
+    // Fallback: simple query without relations
     const participants = await db.query.participant.findMany({
       limit,
     });
+    console.log(
+      `[Fallback] Exporting ${participants.length} records without relations.`
+    );
     const mlRecords = transformSimpleToMLFormat(participants);
     await ensureDirs();
     const tempFilePath = path.join(
