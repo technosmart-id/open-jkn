@@ -2,10 +2,8 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-const databaseUrl = process.env.DATABASE_URL;
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL is not set");
-}
+// Don't bake DATABASE_URL into config - use environment variable at runtime
+// drizzle-kit will read DATABASE_URL from environment automatically
 
 const config = {
   schema: [
@@ -16,11 +14,11 @@ const config = {
   ],
   out: "./lib/db/migrations",
   dialect: "postgresql",
-  dbCredentials: {
-    url: databaseUrl,
-  },
+  // Don't include dbCredentials - drizzle-kit reads DATABASE_URL from env
 };
 
 const configPath = path.join(process.cwd(), "drizzle.config.json");
 fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
-console.log("Generated drizzle.config.json");
+console.log(
+  "Generated drizzle.config.json (runtime DATABASE_URL will be used)"
+);
