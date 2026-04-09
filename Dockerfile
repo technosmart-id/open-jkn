@@ -64,7 +64,8 @@ COPY --from=builder /app/lib/db ./lib/db
 COPY --from=builder /app/ai ./ai
 
 # Install Python dependencies for AI features
-RUN pip3 install --no-cache-dir -r /app/ai/requirements.txt
+# Use --break-system-packages to work with PEP 668 in Python 3.13+
+RUN pip3 install --break-system-packages --no-cache-dir -r /app/ai/requirements.txt
 
 # Make drizzle.config.json writable for runtime regeneration
 RUN chown nextjs:nodejs /app/drizzle.config.json && \
