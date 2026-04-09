@@ -23,8 +23,13 @@ The backend team may also import and call score functions directly:
 import os
 import sys
 
+# Early pulse print
+sys.stdout.write("--- PULSE: AI script starting ---\n")
+sys.stdout.flush()
+
 # Silence TF before imports
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["ABSL_LOGGING_LEVEL"] = "ERROR"
 
 try:
     import pandas as pd

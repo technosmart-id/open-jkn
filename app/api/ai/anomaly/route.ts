@@ -129,7 +129,7 @@ function runPythonScript(
   dataPath: string
 ): Promise<string> {
   return new Promise((resolve, reject) => {
-    const python = spawn("python3", [scriptPath, dataPath], {
+    const python = spawn("python3", ["-u", scriptPath, dataPath], {
       env: {
         ...process.env,
         OPENJKN_AI_OUTPUT_DIR: OUTPUT_DIR,
@@ -151,7 +151,9 @@ function runPythonScript(
         resolve(output);
       } else {
         reject(
-          new Error(`Python script exited with code ${code}: ${errorOutput}`)
+          new Error(
+            `Python script exited with code ${code}:\n--- STDOUT ---\n${output}\n--- STDERR ---\n${errorOutput}`
+          )
         );
       }
     });

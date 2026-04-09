@@ -47,11 +47,14 @@ RUN apt-get update && apt-get install -y python3 python3-pip python3-venv && rm 
 RUN groupadd --system --gid 1001 nodejs
 RUN useradd --system --uid 1001 --gid nodejs -m nextjs
 
-# Set environment variables for Matplotlib and TensorFlow
+# Set environment variables for Matplotlib, TensorFlow, and Python
 ENV MPLCONFIGDIR=/tmp/matplotlib-cache
 ENV TF_ENABLE_ONEDNN_OPTS=0
 ENV CUDA_VISIBLE_DEVICES=-1
 ENV TF_CPP_MIN_LOG_LEVEL=3
+ENV TF_CPP_MAX_VLOG_LEVEL=0
+ENV PYTHONUNBUFFERED=1
+ENV ABSL_LOGGING_LEVEL=ERROR
 
 # Copy necessary files
 COPY --from=builder /app/public ./public
