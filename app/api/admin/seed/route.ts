@@ -16,12 +16,7 @@ import {
 function generateDrizzleConfig() {
   // Regenerate drizzle.config.json with current runtime DATABASE_URL
   const config = {
-    schema: [
-      "./lib/db/schema/auth.ts",
-      "./lib/db/schema/index.ts",
-      "./lib/db/schema/pbb/index.ts",
-      "./lib/db/schema/jkn/index.ts",
-    ],
+    schema: ["./lib/db/schema/auth.ts", "./lib/db/schema/jkn/index.ts"],
     out: "./lib/db/migrations",
     dialect: "postgresql",
     dbCredentials: {
