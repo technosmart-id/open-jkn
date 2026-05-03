@@ -1,4 +1,5 @@
 import { jknRouter } from "./routers/jkn";
+import { satusehatRouter } from "./routers/satusehat";
 import { protectedProcedure, publicProcedure } from "./server";
 
 export const router = {
@@ -15,6 +16,8 @@ export const router = {
   })),
 
   jkn: jknRouter,
+
+  satusehat: satusehatRouter,
 };
 
 export type Router = typeof router;

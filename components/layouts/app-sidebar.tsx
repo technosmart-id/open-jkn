@@ -67,6 +67,11 @@ const navMain = [
     icon: Brain,
   },
   {
+    title: "SatuSehat IHS",
+    url: "/satusehat",
+    icon: ClipboardList,
+  },
+  {
     title: "Sync openIMIS",
     url: "/sync",
     icon: RefreshCw,

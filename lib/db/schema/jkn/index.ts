@@ -156,6 +156,9 @@ export const participant = pgTable("participant", {
   // BPJS identifier
   bpjsNumber: varchar("bpjsNumber", { length: 13 }).unique(),
 
+  // SatuSehat identifier (FHIR Patient resource ID)
+  satusehatId: text("satusehatId"),
+
   // Personal identity
   familyCardNumber: varchar("familyCardNumber", { length: 16 }).notNull(),
   identityNumber: varchar("identityNumber", { length: 16 }).notNull(), // NIK/KITAS/KITAP
@@ -320,6 +323,9 @@ export const healthcareFacility = pgTable("healthcare_facility", {
 
   isActive: boolean("isActive").notNull().default(true),
 
+  // SatuSehat identifier (FHIR Organization resource ID)
+  satusehatId: text("satusehatId"),
+
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
@@ -450,6 +456,9 @@ export const familyMember = pgTable("family_member", {
     .default(false),
   commercialInsurancePolicyNumber: text("commercialInsurancePolicyNumber"),
   commercialInsuranceCompanyName: text("commercialInsuranceCompanyName"),
+
+  // SatuSehat identifier (FHIR RelatedPerson resource ID)
+  satusehatId: text("satusehatId"),
 
   createdAt: timestamp("createdAt", { precision: 3 }).notNull().defaultNow(),
   updatedAt: timestamp("updatedAt", { precision: 3 }).notNull().defaultNow(),
@@ -601,6 +610,50 @@ export const contributionPayment = pgTable("contribution_payment", {
   updatedAt: timestamp("updatedAt", { precision: 3 }).notNull().defaultNow(),
 });
 
+// SatuSehat sync tracking
+export const satusehatSyncStatusEnum = pgEnum("satusehat_sync_status", [
+  "PENDING",
+  "SYNCED",
+  "FAILED",
+  "UPDATE_NEEDED",
+]);
+
+export const satusehatSync = pgTable("satusehat_sync", {
+  id: serial("id").primaryKey().notNull(),
+
+  // References to local records
+  participantId: integer("participantId").references(() => participant.id, {
+    onDelete: "cascade",
+  }),
+  familyMemberId: integer("familyMemberId").references(() => familyMember.id, {
+    onDelete: "cascade",
+  }),
+  healthcareFacilityId: integer("healthcareFacilityId").references(
+    () => healthcareFacility.id,
+    {
+      onDelete: "cascade",
+    }
+  ),
+
+  // SatuSehat resource info
+  resourceType: varchar("resourceType", {
+    length: 50,
+  }).notNull(), // 'Patient', 'RelatedPerson', 'Organization'
+  satusehatResourceId: text("satusehatResourceId").notNull(), // The FHIR resource ID
+  satusehatUrl: text("satusehatUrl"), // Full URL to the resource in SatuSehat
+
+  // Sync status
+  status: satusehatSyncStatusEnum("status").notNull().default("SYNCED"),
+  lastSyncedAt: timestamp("lastSyncedAt", { precision: 3 }).notNull(),
+  lastSyncError: text("lastSyncError"), // Error message if sync failed
+
+  // Metadata
+  syncVersion: integer("syncVersion").notNull().default(1),
+
+  createdAt: timestamp("createdAt", { precision: 3 }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { precision: 3 }).notNull().defaultNow(),
+});
+
 // Export types
 export type Participant = typeof participant.$inferSelect;
 export type NewParticipant = typeof participant.$inferInsert;
@@ -635,3 +688,6 @@ export type NewDataChangeRequest = typeof dataChangeRequest.$inferInsert;
 
 export type ContributionPayment = typeof contributionPayment.$inferSelect;
 export type NewContributionPayment = typeof contributionPayment.$inferInsert;
+
+export type SatusehatSync = typeof satusehatSync.$inferSelect;
+export type NewSatusehatSync = typeof satusehatSync.$inferInsert;
