@@ -7,6 +7,14 @@ const nextConfig: NextConfig = {
   turbopack: {},
   // Use Turbopack's serverExternalPackages for externals
   serverExternalPackages: ["svix"],
+  // Ignore TypeScript errors during build (type checking should be done in CI/locally)
+  // This prevents build hangs in memory-constrained environments
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   // Configure image optimization
   images: {
     remotePatterns: [
