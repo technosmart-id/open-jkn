@@ -634,13 +634,38 @@ export const satusehatRouter = {
         });
 
         if (!facility) throw new Error("Facility not found");
-        if (!facility.satusehatId)
-          throw new Error("Facility not enrolled in SatuSehat yet");
+        
+        let facilitySatusehatId = facility.satusehatId;
+        
+        if (!facilitySatusehatId) {
+          console.log(`Auto-enrolling facility ${facility.name} (${facility.code}) to SatuSehat...`);
+          const facilityData = mapFacilityToFHIR(facility);
+          const organizationResource = buildOrganizationResource(facilityData, {});
+          const organizationResult = await upsertOrganization(organizationResource);
+          
+          facilitySatusehatId = organizationResult.id;
+          
+          // Update local database
+          await db
+            .update(jknSchema.healthcareFacility)
+            .set({ satusehatId: facilitySatusehatId })
+            .where(eq(jknSchema.healthcareFacility.id, input.facilityId));
+
+          // Create sync record
+          await db.insert(jknSchema.satusehatSync).values({
+            healthcareFacilityId: input.facilityId,
+            resourceType: "Organization",
+            satusehatResourceId: facilitySatusehatId,
+            satusehatUrl: `${process.env.SATUSEHAT_API_URL}/Organization/${facilitySatusehatId}`,
+            status: "SYNCED",
+            lastSyncedAt: new Date(),
+          });
+        }
 
         results.steps.push({
           step: 1,
           name: "Organization Reference",
-          id: facility.satusehatId,
+          id: facilitySatusehatId,
           status: "SUCCESS",
         });
 
@@ -696,7 +721,7 @@ export const satusehatRouter = {
         const encounterResource = buildEncounterResource({
           patientId: patientResult.id!,
           practitionerId: practitionerResult.id!,
-          organizationId: facility.satusehatId,
+          organizationId: facilitySatusehatId!,
           locationId: locationResult.id,
           status: "arrived",
         });

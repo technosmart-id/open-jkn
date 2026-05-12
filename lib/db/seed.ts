@@ -1,7 +1,9 @@
-import { seedAll } from "@/lib/seeders";
+import { config } from "dotenv";
+config({ path: ".env.local" });
 
 async function main() {
   try {
+    const { seedAll } = await import("@/lib/seeders");
     await seedAll();
     process.exit(0);
   } catch (error) {

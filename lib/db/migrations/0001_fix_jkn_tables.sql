@@ -23,6 +23,7 @@ CREATE TABLE healthcare_facility (
   "district" TEXT,
   "city" TEXT,
   "province" TEXT,
+  "satusehatId" TEXT,
   "postalCode" TEXT,
   "phoneNumber" TEXT,
   "email" TEXT,
@@ -54,6 +55,7 @@ CREATE TABLE participant (
   "userId" TEXT,
   "familyCardNumber" TEXT NOT NULL,
   "identityNumber" TEXT NOT NULL,
+  "satusehatId" TEXT,
   "firstName" TEXT NOT NULL,
   "lastName" TEXT,
   "nameOnCard" TEXT,
@@ -167,6 +169,7 @@ CREATE TABLE family_member (
   "hasCommercialInsurance" BOOLEAN DEFAULT false,
   "commercialInsurancePolicyNumber" TEXT,
   "commercialInsuranceCompanyName" TEXT,
+  "satusehatId" TEXT,
   "createdAt" TIMESTAMP DEFAULT NOW() NOT NULL,
   "updatedAt" TIMESTAMP DEFAULT NOW() NOT NULL
 );

@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { orpc } from "@/lib/orpc/client";
+import { Combobox } from "@/components/ui/combobox";
 
 export default function SatuSehatPage() {
   const [participantSearch, setParticipantSearch] = useState("");
@@ -30,15 +31,15 @@ export default function SatuSehatPage() {
   const [status, setStatus] = useState<"arrived" | "in-progress">("arrived");
 
   // Fetch data for selections
-  const { data: participants } = useQuery(
+  const { data: participants, isLoading: isLoadingParticipants } = useQuery(
     orpc.jkn.participant.list.queryOptions({
-      input: { search: participantSearch || undefined, limit: 5 }
+      input: { search: participantSearch || undefined, limit: 10 }
     })
   );
 
-  const { data: facilities } = useQuery(
+  const { data: facilities, isLoading: isLoadingFacilities } = useQuery(
     orpc.jkn.facility.listHealthcareFacilities.queryOptions({
-      input: { search: facilitySearch || undefined, limit: 5 }
+      input: { search: facilitySearch || undefined, limit: 10 }
     })
   );
 
@@ -81,6 +82,18 @@ export default function SatuSehatPage() {
   const isExecuting = triggerPOC.isPending;
   const result = triggerPOC.data;
 
+  const participantOptions = participants?.data.map(p => ({
+    value: p.id,
+    label: `${p.firstName} ${p.lastName || ""}`,
+    description: `NIK: ${p.identityNumber}`
+  })) || [];
+
+  const facilityOptions = facilities?.map(f => ({
+    value: f.id,
+    label: f.name,
+    description: `Kode: ${f.code} • IHS ID: ${f.satusehatId || "Belum Enrolled"}`
+  })) || [];
+
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
       <div>
@@ -109,27 +122,15 @@ export default function SatuSehatPage() {
                 <Label className="text-sm font-semibold flex items-center gap-2">
                   <User className="h-4 w-4" /> 1. Pilih Peserta
                 </Label>
-                <Input 
-                  placeholder="Cari NIK atau Nama..." 
-                  value={participantSearch}
-                  onChange={(e) => setParticipantSearch(e.target.value)}
+                <Combobox 
+                  options={participantOptions}
+                  value={selectedParticipantId}
+                  onValueChange={setSelectedParticipantId}
+                  onSearchChange={setParticipantSearch}
+                  isLoading={isLoadingParticipants}
+                  placeholder="Pilih Peserta..."
+                  searchPlaceholder="Cari NIK atau Nama..."
                 />
-                <div className="grid gap-2 mt-2">
-                  {participants?.data.map((p) => (
-                    <button
-                      key={p.id}
-                      onClick={() => setSelectedParticipantId(p.id)}
-                      className={`flex flex-col items-start p-3 text-left text-sm border rounded-lg transition-all ${
-                        selectedParticipantId === p.id 
-                          ? "border-primary bg-primary/5 ring-1 ring-primary" 
-                          : "hover:bg-muted"
-                      }`}
-                    >
-                      <span className="font-bold">{p.firstName} {p.lastName}</span>
-                      <span className="text-xs text-muted-foreground">NIK: {p.identityNumber}</span>
-                    </button>
-                  ))}
-                </div>
               </div>
 
               <Separator />
@@ -139,27 +140,15 @@ export default function SatuSehatPage() {
                 <Label className="text-sm font-semibold flex items-center gap-2">
                   <Hospital className="h-4 w-4" /> 2. Pilih Faskes
                 </Label>
-                <Input 
-                  placeholder="Cari Kode atau Nama Faskes..." 
-                  value={facilitySearch}
-                  onChange={(e) => setFacilitySearch(e.target.value)}
+                <Combobox 
+                  options={facilityOptions}
+                  value={selectedFacilityId}
+                  onValueChange={setSelectedFacilityId}
+                  onSearchChange={setFacilitySearch}
+                  isLoading={isLoadingFacilities}
+                  placeholder="Pilih Faskes..."
+                  searchPlaceholder="Cari Kode atau Nama Faskes..."
                 />
-                <div className="grid gap-2 mt-2">
-                  {facilities?.map((f) => (
-                    <button
-                      key={f.id}
-                      onClick={() => setSelectedFacilityId(f.id)}
-                      className={`flex flex-col items-start p-3 text-left text-sm border rounded-lg transition-all ${
-                        selectedFacilityId === f.id 
-                          ? "border-primary bg-primary/5 ring-1 ring-primary" 
-                          : "hover:bg-muted"
-                      }`}
-                    >
-                      <span className="font-bold">{f.name}</span>
-                      <span className="text-xs text-muted-foreground">Kode: {f.code} • IHS ID: {f.satusehatId || "Belum Enrolled"}</span>
-                    </button>
-                  ))}
-                </div>
               </div>
 
               <Separator />

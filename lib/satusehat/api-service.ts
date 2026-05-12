@@ -17,7 +17,7 @@ import type {
 
 // Environment configuration
 const SATUSEHAT_CONFIG = {
-  apiUrl: (process.env.SATUSEHAT_API_URL || "https://api-satusehat-stg.dto.kemkes.go.id/fhir-r4").trim(),
+  apiUrl: (process.env.SATUSEHAT_API_URL || "https://api-satusehat-stg.dto.kemkes.go.id/fhir-r4/v1").trim(),
   authUrl:
     (process.env.SATUSEHAT_AUTH_URL ||
     "https://api-satusehat-stg.dto.kemkes.go.id/oauth2/v1").trim(),
