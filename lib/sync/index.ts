@@ -161,21 +161,18 @@ export class SyncService {
     }
 
     // Step 3: Check/create policy for active participants
-    if (
-      (participant as any).statusPeserta === "AKTIF" &&
-      participant.bpjsNumber
-    ) {
+    if (participant.isActive && participant.bpjsNumber) {
       const policyUUID = `POL-${participant.bpjsNumber}`;
       const policyData = {
         auditUserId: DEFAULT_AUDIT_USER_ID,
         validityFrom: new Date(),
         policyUuid: policyUUID,
         familyId: imisFamily.FamilyID,
-        effectiveDate: (participant as any).effectiveDate || new Date(),
+        effectiveDate: participant.effectiveDate || new Date(),
         expiryDate:
-          (participant as any).expiryDate ||
+          participant.expiryDate ||
           new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-        status: mapPolicyStatus((participant as any).statusPeserta),
+        status: mapPolicyStatus(participant.isActive ? "AKTIF" : "NON_AKTIF"),
         enrollDate: new Date(),
         startDate: new Date(),
         prodId: DEFAULT_PROD_ID,
